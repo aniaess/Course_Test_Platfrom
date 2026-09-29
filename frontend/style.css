@@ -1,0 +1,52 @@
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 80px auto;
+    text-align: center;
+}
+
+.form-container h1 {
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-container button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#register-message {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#register-message {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.success-message {
+    color: green;
+}
+
+.error-message {
+    color: red;
+}

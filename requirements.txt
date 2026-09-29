@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+psycopg2-binary
+pytest
+playwright
+requests
+email-validator
+pytest-html
+pytest-playwright
