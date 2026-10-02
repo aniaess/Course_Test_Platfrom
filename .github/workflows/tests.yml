@@ -8,6 +8,19 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    env:
+      POSTGRES_DB: course_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: course_platform
+      DB_USER: postgres
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      BASE_URL: http://api:8000
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
