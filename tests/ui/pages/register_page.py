@@ -13,7 +13,7 @@ class RegisterPage(BasePage):
         self.name_input = page.locator("#name")
         self.email_input = page.locator("#email")
         self.password_input = page.locator("#password")
-        self.register_button = page.locator("#register-form button")
+        self.register_button = page.locator('#register-form button[type="submit"]')
         self.register_message = page.locator("#register-message")
 
     def open(self):

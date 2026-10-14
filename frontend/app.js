@@ -1,3 +1,19 @@
+const passwordToggle = document.querySelector(".toggle-password");
+
+if (passwordToggle) {
+    passwordToggle.addEventListener("click", () => {
+        const passwordInput = document.getElementById("password");
+        const isVisible = passwordInput.type === "text";
+
+        passwordInput.type = isVisible ? "password" : "text";
+        passwordToggle.setAttribute("aria-pressed", String(!isVisible));
+        passwordToggle.setAttribute(
+            "aria-label",
+            isVisible ? "Show password" : "Hide password"
+        );
+    });
+}
+
 const registerForm = document.getElementById("register-form");
 
 if (registerForm) {

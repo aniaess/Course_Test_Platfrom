@@ -9,57 +9,159 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="auth-page">
 
-<header>
-    <nav>
+<header class="auth-header">
+
+    <a class="brand" href="index.html">
+        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3z"/>
+            <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+        </svg>
+        Course Platform
+    </a>
+
+    <nav class="auth-nav">
         <a href="index.html">Home</a>
-        <a href="login.html">Login</a>
-        <a href="register.html">Register</a>
+        <a class="nav-button" href="login.html">Log in</a>
     </nav>
+
 </header>
 
-<main>
-    <section class="form-container">
+<main class="auth-layout">
 
-        <h1>Create account</h1>
+    <section class="promo">
+
+        <h1 class="promo-title">
+            Grow
+            <span>your skills</span>
+        </h1>
+
+        <p class="promo-text">
+            Practical online courses that help you gain new knowledge
+            and reach your goals &ndash; at your own pace.
+        </p>
+
+        <ul class="benefits">
+            <li>
+                <span class="benefit-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 6.5C10.2 5.2 7.8 4.5 5 4.5c-1 0-2 .1-3 .3v14c1-.2 2-.3 3-.3 2.8 0 5.2.7 7 2 1.8-1.3 4.2-2 7-2 1 0 2 .1 3 .3v-14c-1-.2-2-.3-3-.3-2.8 0-5.2.7-7 2zm0 0v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                High-quality materials
+            </li>
+            <li>
+                <span class="benefit-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="13" width="4" height="8" rx="1"/>
+                        <rect x="10" y="8" width="4" height="13" rx="1"/>
+                        <rect x="17" y="3" width="4" height="18" rx="1"/>
+                    </svg>
+                </span>
+                Track your progress
+            </li>
+            <li>
+                <span class="benefit-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8L12 2.5z"/>
+                    </svg>
+                </span>
+                Earn certificates
+            </li>
+        </ul>
+
+    </section>
+
+    <section class="form-container auth-card">
+
+        <h1>Create your <span class="nowrap">account <span aria-hidden="true">👋</span></span></h1>
+
+        <p class="auth-subtitle">
+            Sign up and start learning today.
+        </p>
 
         <form id="register-form">
 
             <div class="form-group">
                 <label for="name">Name</label>
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                >
+                <div class="input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your name"
+                        autocomplete="name"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="email">Email</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                >
+                <label for="email">Email address</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                >
+                <div class="input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    </svg>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="new-password"
+                    >
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                        aria-controls="password"
+                    >
+                        <svg class="icon-eye" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        </svg>
+                        <svg class="icon-eye-off" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7c1.9 0 3.6-.6 5-1.5M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            <button type="submit">Register</button>
+            <button type="submit" class="primary-button">Create account</button>
 
         </form>
 
-        <p id="register-message"></p>
+        <p id="register-message" role="status"></p>
+
+        <p class="auth-switch">
+            Already have an account?
+            <a href="login.html">Log in</a>
+        </p>
 
     </section>
+
 </main>
 
 <script src="app.js"></script>
