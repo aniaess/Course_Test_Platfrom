@@ -1,5 +1,3 @@
-alert("APP.JS WORKS!");
-
 const registerForm = document.getElementById("register-form");
 
 if (registerForm) {
@@ -59,25 +57,37 @@ if (registerForm) {
 
         console.log("Sending registration request...");
 
-        const response = await fetch("/users", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(userData)
-        });
+        let response;
+
+        try {
+            response = await fetch("/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userData)
+            });
+        } catch (error) {
+            console.error("Registration request failed:", error);
+            message.textContent = "Cannot connect to the server. Please check your connection.";
+            message.className = "error-message";
+            return;
+        }
 
         console.log("Response status:", response.status);
 
-        const data = await response.json();
+        const data = await response.json().catch(() => null);
 
         console.log("Response data:", data);
 
         if (response.status === 201) {
             message.textContent = "Registration successful!";
             message.className = "success-message";
-        } else if (response.status === 409) {
+        } else if (response.status === 409 && data) {
             message.textContent = data.detail;
+            message.className = "error-message";
+        } else {
+            message.textContent = "Something went wrong. Please try again later.";
             message.className = "error-message";
         }
     });

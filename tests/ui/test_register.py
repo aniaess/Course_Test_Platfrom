@@ -128,3 +128,71 @@ def test_user_cannot_register_with_too_short_name(register_page):
     )
 
     expect(register_page.get_message()).to_have_text(Messages.NAME_TOO_SHORT)
+
+
+def test_user_sees_error_message_when_server_returns_500(
+    register_page,
+    user_data
+):
+    """
+    Verify that the user sees an error message when the server
+    returns HTTP 500 during registration.
+
+    The registration request is intercepted and answered with
+    HTTP 500 and a non-JSON body, as returned by a failing server.
+
+    The test verifies that a generic server error message is displayed
+    to the user.
+    """
+
+    register_page.page.route(
+        "**/users",
+        lambda route: route.fulfill(
+            status=500,
+            content_type="text/plain",
+            body="Internal Server Error"
+        )
+    )
+
+    register_page.open()
+
+    register_page.register_user(
+        name=user_data["name"],
+        email=user_data["email"],
+        password=user_data["password"]
+    )
+
+    expect(register_page.get_message()).to_have_text(Messages.SERVER_ERROR)
+    expect(register_page.get_message()).to_have_class("error-message")
+
+
+def test_user_sees_error_message_when_connection_fails(
+    register_page,
+    user_data
+):
+    """
+    Verify that the user sees an error message when the registration
+    request cannot reach the server.
+
+    The registration request is intercepted and aborted to simulate
+    a network failure.
+
+    The test verifies that a connection error message is displayed
+    to the user.
+    """
+
+    register_page.page.route(
+        "**/users",
+        lambda route: route.abort("connectionrefused")
+    )
+
+    register_page.open()
+
+    register_page.register_user(
+        name=user_data["name"],
+        email=user_data["email"],
+        password=user_data["password"]
+    )
+
+    expect(register_page.get_message()).to_have_text(Messages.CONNECTION_ERROR)
+    expect(register_page.get_message()).to_have_class("error-message")
