@@ -310,3 +310,36 @@ def test_create_user_with_password_length_boundary(
             "body",
             "password"
         ]
+
+
+def test_create_user_response_does_not_expose_password(
+    api_client,
+    user_data
+):
+    """
+    Verify that the API response does not expose the user's password
+    or its hash.
+
+    The test creates a user through the API and checks the response body.
+
+    The test verifies that the response contains only the public user
+    fields (id, name, email), that no value equals the password sent
+    in the request, and that no value looks like an Argon2 hash.
+    """
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+
+    response_data = response.json()
+
+    assert set(response_data.keys()) == {"id", "name", "email"}
+
+    for value in response_data.values():
+        assert value != user_data["password"]
+
+        if isinstance(value, str):
+            assert not value.startswith("$argon2")

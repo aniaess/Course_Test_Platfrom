@@ -1,4 +1,5 @@
 import pytest
+import uuid
 
 from psycopg2.errors import NotNullViolation
 
@@ -169,3 +170,137 @@ def test_users_table_has_expected_columns(db_connection):
     ]
 
     assert columns == expected_columns
+
+
+def get_stored_password(db_connection, email):
+    """Return the password value stored in the database for the given email."""
+
+    cursor = db_connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT password
+        FROM users
+        WHERE email = %s
+        """,
+        (email,)
+    )
+
+    row = cursor.fetchone()
+
+    cursor.close()
+
+    assert row is not None, f"User with email {email} was not found"
+
+    return row[0]
+
+
+def test_password_is_not_stored_in_plaintext(
+    api_client,
+    db_connection,
+    user_data
+):
+    """
+    Verify that the user's password is not stored in plaintext.
+
+    The test creates a user through the API and then reads the stored
+    password value from the database.
+
+    The test verifies that the stored value is different from the
+    password sent in the registration request.
+    """
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+
+    stored_password = get_stored_password(
+        db_connection,
+        user_data["email"]
+    )
+
+    assert stored_password != user_data["password"]
+
+
+def test_password_is_stored_as_argon2id_hash(
+    api_client,
+    db_connection,
+    user_data
+):
+    """
+    Verify that the user's password is stored as an Argon2id hash.
+
+    The test creates a user through the API and then reads the stored
+    password value from the database.
+
+    The test verifies that the stored value uses the Argon2id PHC string
+    format (prefix "$argon2id$") and fits in the password column.
+    """
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+
+    stored_password = get_stored_password(
+        db_connection,
+        user_data["email"]
+    )
+
+    assert stored_password.startswith("$argon2id$")
+    assert len(stored_password) <= 255
+
+
+def test_same_password_produces_different_stored_values(
+    api_client,
+    db_connection,
+    user_data
+):
+    """
+    Verify that the same password produces different stored values
+    for different users.
+
+    The test creates two users through the API with the same password
+    and different email addresses, then reads both stored password
+    values from the database.
+
+    The test verifies that the stored values are different, which
+    confirms that each password hash uses its own salt.
+    """
+
+    second_user_data = {
+        "name": "Another User",
+        "email": f"playwright-{uuid.uuid4()}@test.pl",
+        "password": user_data["password"]
+    }
+
+    first_response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert first_response.status_code == 201
+
+    second_response = api_client.post(
+        "/users",
+        json=second_user_data
+    )
+
+    assert second_response.status_code == 201
+
+    first_stored_password = get_stored_password(
+        db_connection,
+        user_data["email"]
+    )
+
+    second_stored_password = get_stored_password(
+        db_connection,
+        second_user_data["email"]
+    )
+
+    assert first_stored_password != second_stored_password

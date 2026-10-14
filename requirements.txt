@@ -7,3 +7,4 @@ requests
 email-validator
 pytest-html
 pytest-playwright
+argon2-cffi

@@ -297,3 +297,12 @@ Future development may include:
 - Expanded GitHub Actions pipeline
 - Improved test data management
 - More comprehensive API and UI coverage
+
+## AI-Assisted Testing
+
+## Documentation
+
+- [Registration Requirements](docs/requirements/registration_requirements.md)
+- [Registration Test Plan](docs/test-plans/registration_test_plan.md)
+- [Login Requirements](docs/requirements/login_requirements.md)
+- [Login Test Plan](docs/test-plans/login_test_plan.md)

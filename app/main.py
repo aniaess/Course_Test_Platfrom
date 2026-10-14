@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from argon2 import PasswordHasher
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -13,6 +14,8 @@ from utils.logger import get_logger
 
 
 app = FastAPI()
+
+password_hasher = PasswordHasher()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -68,7 +71,7 @@ def create_user(user: User):
             VALUES (%s, %s, %s)
             RETURNING id
             """,
-            (user.name, user.email, user.password)
+            (user.name, user.email, password_hasher.hash(user.password))
         )
 
         user_id = cursor.fetchone()[0]

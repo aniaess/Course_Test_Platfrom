@@ -107,3 +107,24 @@ def test_user_cannot_register_with_existing_email(
     expect(register_page.get_message()).to_have_text(
         Messages.EMAIL_ALREADY_EXISTS
     )
+
+def test_user_cannot_register_with_too_short_password(register_page):
+    register_page.open()
+
+    register_page.register_user(
+        name="Test User",
+        email="test@test.pl",
+        password="1234567",
+    )
+
+    expect(register_page.get_message()).to_have_text(Messages.PASSWORD_TOO_SHORT)
+
+def test_user_cannot_register_with_too_short_name(register_page):
+    register_page.open()
+    register_page.register_user(
+        name="A",
+        email="test@test.pl",
+        password="secret123",
+    )
+
+    expect(register_page.get_message()).to_have_text(Messages.NAME_TOO_SHORT)

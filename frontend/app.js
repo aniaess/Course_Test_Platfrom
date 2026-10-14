@@ -45,6 +45,12 @@ if (registerForm) {
             return;
         }
 
+        if (password.length < 8) {
+            message.textContent = "Password must be at least 8 characters long.";
+            message.className = "error-message";
+            return;
+        }
+
         const userData = {
             name: name,
             email: email,
