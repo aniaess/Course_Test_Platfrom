@@ -16,6 +16,9 @@ The registration form contains three required fields:
 ## 3. Name Requirements
 
 - The name is required.
+- Leading and trailing whitespace is removed before validation
+  and storage.
+- A name made only of whitespace is rejected.
 - The minimum length is 2 characters.
 - The maximum length is 100 characters.
 - Names shorter than 2 characters must be rejected.
@@ -33,6 +36,8 @@ The registration form contains three required fields:
 ## 5. Password Requirements
 
 - The password is required.
+- Whitespace in the password is preserved, including leading
+  and trailing spaces.
 - The minimum length is 8 characters.
 - Passwords shorter than 8 characters are rejected.
 - A maximum password length has not yet been defined.
@@ -64,7 +69,6 @@ The registration form contains three required fields:
 The following rules require clarification:
 
 - Is email comparison case-sensitive?
-- Is whitespace removed from input fields?
 - Is there a maximum password length?
 - Are additional password complexity rules required?
 - Is rate limiting required?

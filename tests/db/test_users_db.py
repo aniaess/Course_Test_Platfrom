@@ -1,6 +1,9 @@
 import pytest
 import uuid
 
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+
 from psycopg2.errors import NotNullViolation
 
 
@@ -304,3 +307,82 @@ def test_same_password_produces_different_stored_values(
     )
 
     assert first_stored_password != second_stored_password
+
+
+def test_name_is_stored_without_surrounding_whitespace(
+    api_client,
+    db_connection,
+    user_data
+):
+    """
+    Verify that the name is stored without leading and trailing
+    whitespace.
+
+    The test creates a user through the API with a name surrounded
+    by spaces and reads the stored name from the database.
+    """
+
+    user_data["name"] = "  Test User  "
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+
+    cursor = db_connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT name
+        FROM users
+        WHERE email = %s
+        """,
+        (user_data["email"],)
+    )
+
+    stored_name = cursor.fetchone()[0]
+
+    cursor.close()
+
+    assert stored_name == "Test User"
+
+
+def test_password_whitespace_is_preserved(
+    api_client,
+    db_connection,
+    user_data
+):
+    """
+    Verify that leading and trailing whitespace in the password
+    is not removed.
+
+    The test creates a user through the API with a password surrounded
+    by spaces and reads the stored hash from the database.
+
+    The test verifies that the hash matches the password with spaces
+    and does not match the trimmed password.
+    """
+
+    password = "  secret123  "
+    user_data["password"] = password
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+
+    stored_password = get_stored_password(
+        db_connection,
+        user_data["email"]
+    )
+
+    password_hasher = PasswordHasher()
+
+    assert password_hasher.verify(stored_password, password)
+
+    with pytest.raises(VerifyMismatchError):
+        password_hasher.verify(stored_password, password.strip())

@@ -1,11 +1,12 @@
 from pathlib import Path
+from typing import Annotated
 
 from argon2 import PasswordHasher
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, StringConstraints
 
 from psycopg2.errors import UniqueViolation
 
@@ -34,7 +35,10 @@ app.add_middleware(
 
 
 class User(BaseModel):
-    name: str = Field(min_length=2, max_length=100)
+    name: Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, min_length=2, max_length=100)
+    ]
     email: EmailStr
     password: str = Field(min_length=8)
 

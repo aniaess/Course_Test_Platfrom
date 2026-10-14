@@ -31,6 +31,8 @@ Each test case is mapped to the automated test that covers it.
 | REG-API-06 | Invalid email format | "test", "test@", "@test.pl", "test@test", "test.pl", "test@@test.pl" | HTTP 422 | `tests/api/test_users_api.py::test_create_user_with_invalid_email_returns_422` |
 | REG-API-07 | Password length boundaries | 7 / 8 / 100 characters | 422 / 201 / 201 | `tests/api/test_users_api.py::test_create_user_with_password_length_boundary` |
 | REG-API-08 | Response does not expose password | Valid user data | Response contains only id, name, email; no password or Argon2 hash | `tests/api/test_users_api.py::test_create_user_response_does_not_expose_password` |
+| REG-API-09 | Blank name | name = "   " / " A " | HTTP 422 | `tests/api/test_users_api.py::test_create_user_with_blank_name_returns_422` |
+| REG-API-10 | Name whitespace is trimmed | name = "  Test User  " | HTTP 201, response name is "Test User" | `tests/api/test_users_api.py::test_create_user_trims_name_whitespace` |
 
 ## 3. Database
 
@@ -43,6 +45,8 @@ Each test case is mapped to the automated test that covers it.
 | REG-DB-05 | Password not stored in plaintext | User created through the API | Stored value differs from the password | `tests/db/test_users_db.py::test_password_is_not_stored_in_plaintext` |
 | REG-DB-06 | Password stored as Argon2id hash | User created through the API | Stored value starts with `$argon2id$` and has at most 255 characters | `tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash` |
 | REG-DB-07 | Unique salt per password | Two users with the same password | Stored values are different | `tests/db/test_users_db.py::test_same_password_produces_different_stored_values` |
+| REG-DB-08 | Name stored trimmed | name = "  Test User  " | Stored name is "Test User" | `tests/db/test_users_db.py::test_name_is_stored_without_surrounding_whitespace` |
+| REG-DB-09 | Password whitespace preserved | password = "  secret123  " | Hash matches the password with spaces, not the trimmed one | `tests/db/test_users_db.py::test_password_whitespace_is_preserved` |
 
 ## 4. Not Yet Covered
 
@@ -51,6 +55,5 @@ These cases depend on the open questions in the requirements:
 - Name too long in the UI (message "Name is too long." is defined in `tests/messages.py`, but no UI test uses it).
 - Invalid email format in the UI.
 - Case-insensitive email uniqueness.
-- Whitespace trimming in input fields.
 - Maximum password length and complexity rules.
 - Rate limiting of registration requests.

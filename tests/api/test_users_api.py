@@ -343,3 +343,55 @@ def test_create_user_response_does_not_expose_password(
 
         if isinstance(value, str):
             assert not value.startswith("$argon2")
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "   ",   # whitespace only
+        " A ",   # 1 character after trimming - below minimum
+    ]
+)
+def test_create_user_with_blank_name_returns_422(
+    api_client,
+    user_data,
+    name
+):
+    """
+    Verify that the API rejects a name that is too short after
+    leading and trailing whitespace is removed.
+
+    The test sends a name made only of spaces, and a name that has
+    fewer than 2 characters once the surrounding spaces are removed.
+
+    The test verifies that the API returns HTTP 422.
+    """
+
+    user_data["name"] = name
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 422
+
+
+def test_create_user_trims_name_whitespace(api_client, user_data):
+    """
+    Verify that the API removes leading and trailing whitespace
+    from the name.
+
+    The test sends a name surrounded by spaces and verifies that
+    the API returns HTTP 201 with the trimmed name.
+    """
+
+    user_data["name"] = "  Test User  "
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+    assert response.json()["name"] == "Test User"
