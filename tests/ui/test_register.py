@@ -119,15 +119,26 @@ def test_user_cannot_register_with_too_short_password(register_page):
 
     expect(register_page.get_message()).to_have_text(Messages.PASSWORD_TOO_SHORT)
 
-def test_user_cannot_register_with_too_short_name(register_page):
+@pytest.mark.parametrize(
+    "name, expected_message",
+    [
+        ("A", Messages.NAME_TOO_SHORT),        # 1 character - below minimum
+        ("A" * 101, Messages.NAME_TOO_LONG),   # 101 characters - above maximum
+    ]
+)
+def test_user_cannot_register_with_invalid_name_length(
+    register_page,
+    name,
+    expected_message
+):
     register_page.open()
     register_page.register_user(
-        name="A",
+        name=name,
         email="test@test.pl",
         password="secret123",
     )
 
-    expect(register_page.get_message()).to_have_text(Messages.NAME_TOO_SHORT)
+    expect(register_page.get_message()).to_have_text(expected_message)
 
 
 def test_user_sees_error_message_when_server_returns_500(

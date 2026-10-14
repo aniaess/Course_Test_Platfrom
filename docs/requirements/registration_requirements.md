@@ -55,16 +55,49 @@ The registration form contains three required fields:
 | Invalid email format | 422 |
 | Value outside defined length limits | 422 |
 
-## 7. Data Integrity and Security
+- A successful registration returns only the public user
+  fields: `id`, `name` and `email`.
+- A 422 response identifies the invalid field
+  in `detail[].loc`.
+
+## 7. UI Requirements
+
+The registration form validates the input before sending
+the request and displays one of the following messages:
+
+| Situation | Message |
+|---|---|
+| Successful registration | Registration successful! |
+| Empty name | Name cannot be empty. |
+| Name shorter than 2 characters | Name is too short. |
+| Name longer than 100 characters | Name is too long. |
+| Empty email | Email cannot be empty. |
+| Empty password | Password cannot be empty. |
+| Password shorter than 8 characters | Password must be at least 8 characters long. |
+| Existing email (HTTP 409) | User with this email already exists |
+| Server error or any other unexpected status | Something went wrong. Please try again later. |
+| Server cannot be reached | Cannot connect to the server. Please check your connection. |
+
+- The success message uses the `success-message` style;
+  all other messages use the `error-message` style.
+
+## 8. Data Integrity and Security
 
 - User data must be persisted in PostgreSQL.
+- The `users` table contains the columns `id` (integer),
+  `name` (VARCHAR(100)), `email` (VARCHAR(255))
+  and `password` (VARCHAR(255)).
 - Email addresses must be unique.
 - Required database fields must not be NULL.
 - Passwords must not be stored in plaintext.
-- API responses must not unnecessarily expose
-  sensitive information.
+- Passwords are hashed with Argon2id and stored as a PHC string
+  (prefix `$argon2id$`) of at most 255 characters.
+- Each password hash uses its own random salt, so the same password
+  produces a different stored value for each user.
+- API responses must never contain the password
+  or its hash.
 
-## 8. Open Questions
+## 9. Open Questions
 
 The following rules require clarification:
 

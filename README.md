@@ -303,6 +303,4 @@ Future development may include:
 ## Documentation
 
 - [Registration Requirements](docs/requirements/registration_requirements.md)
-- [Registration Test Plan](docs/test-plans/registration_test_plan.md)
-- [Login Requirements](docs/requirements/login_requirements.md)
-- [Login Test Plan](docs/test-plans/login_test_plan.md)
+- [Registration Test Cases](docs/registration/test_cases.md)
