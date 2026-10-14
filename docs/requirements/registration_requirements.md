@@ -27,6 +27,8 @@ The registration form contains three required fields:
 ## 4. Email Requirements
 
 - The email is required.
+- Leading and trailing whitespace is removed before validation
+  and storage.
 - The email must have a valid format.
 - The email must be unique.
 - Registering an existing email returns HTTP 409.
@@ -40,7 +42,8 @@ The registration form contains three required fields:
   and trailing spaces.
 - The minimum length is 8 characters.
 - Passwords shorter than 8 characters are rejected.
-- A maximum password length has not yet been defined.
+- The maximum length is 128 characters.
+- Passwords longer than 128 characters are rejected.
 - Additional password complexity requirements
   have not yet been defined.
 
@@ -74,6 +77,7 @@ the request and displays one of the following messages:
 | Empty email | Email cannot be empty. |
 | Empty password | Password cannot be empty. |
 | Password shorter than 8 characters | Password must be at least 8 characters long. |
+| Password longer than 128 characters | Password must be at most 128 characters long. |
 | Existing email (HTTP 409) | User with this email already exists |
 | Server error or any other unexpected status | Something went wrong. Please try again later. |
 | Server cannot be reached | Cannot connect to the server. Please check your connection. |
@@ -102,6 +106,5 @@ the request and displays one of the following messages:
 The following rules require clarification:
 
 - Is email comparison case-sensitive?
-- Is there a maximum password length?
 - Are additional password complexity rules required?
 - Is rate limiting required?

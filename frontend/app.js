@@ -49,6 +49,12 @@ if (registerForm) {
             return;
         }
 
+        if (password.length > 128) {
+            message.textContent = "Password must be at most 128 characters long.";
+            message.className = "error-message";
+            return;
+        }
+
         const userData = {
             name: name,
             email: email,

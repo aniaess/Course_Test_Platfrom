@@ -268,9 +268,10 @@ def test_create_user_with_invalid_email_returns_422(
 @pytest.mark.parametrize(
     "password, expected_status_code",
     [
-        ("1234567", 422),
-        ("12345678", 201),
-        ("A" * 100, 201),
+        ("1234567", 422),     # 7 characters - below minimum
+        ("12345678", 201),    # 8 characters - minimum
+        ("A" * 128, 201),     # 128 characters - maximum
+        ("A" * 129, 422),     # 129 characters - above maximum
     ]
 )
 def test_create_user_with_password_length_boundary(
@@ -395,3 +396,59 @@ def test_create_user_trims_name_whitespace(api_client, user_data):
 
     assert response.status_code == 201
     assert response.json()["name"] == "Test User"
+
+
+def test_create_user_trims_email_whitespace(api_client, user_data):
+    """
+    Verify that the API removes leading and trailing whitespace
+    from the email.
+
+    The test sends an email surrounded by spaces and verifies that
+    the API returns HTTP 201 with the trimmed email.
+    """
+
+    email = user_data["email"]
+    user_data["email"] = f"  {email}  "
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+    assert response.json()["email"] == email
+
+
+def test_create_user_with_existing_email_surrounded_by_whitespace_returns_409(
+    api_client,
+    user_data
+):
+    """
+    Verify that whitespace around an email does not bypass
+    the unique email rule.
+
+    The test creates a user, then sends a second request with the same
+    email surrounded by spaces.
+
+    The test verifies that the API returns HTTP 409 Conflict.
+    """
+
+    first_response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert first_response.status_code == 201
+
+    duplicate_user_data = {
+        "name": "Another User",
+        "email": f"  {user_data['email']}  ",
+        "password": "anotherpassword123"
+    }
+
+    second_response = api_client.post(
+        "/users",
+        json=duplicate_user_data
+    )
+
+    assert second_response.status_code == 409

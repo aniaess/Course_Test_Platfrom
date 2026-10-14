@@ -8,6 +8,7 @@ class Messages:
 
     PASSWORD_REQUIRED = "Password cannot be empty."
     PASSWORD_TOO_SHORT = "Password must be at least 8 characters long."
+    PASSWORD_TOO_LONG = "Password must be at most 128 characters long."
 
     SERVER_ERROR = "Something went wrong. Please try again later."
     CONNECTION_ERROR = "Cannot connect to the server. Please check your connection."

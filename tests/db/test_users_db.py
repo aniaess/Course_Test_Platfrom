@@ -386,3 +386,45 @@ def test_password_whitespace_is_preserved(
 
     with pytest.raises(VerifyMismatchError):
         password_hasher.verify(stored_password, password.strip())
+
+
+def test_email_is_stored_without_surrounding_whitespace(
+    api_client,
+    db_connection,
+    user_data
+):
+    """
+    Verify that the email is stored without leading and trailing
+    whitespace.
+
+    The test creates a user through the API with an email surrounded
+    by spaces and verifies that the database contains the trimmed email.
+    """
+
+    email = user_data["email"]
+    user_data["email"] = f"  {email}  "
+
+    response = api_client.post(
+        "/users",
+        json=user_data
+    )
+
+    assert response.status_code == 201
+
+    cursor = db_connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT email
+        FROM users
+        WHERE email = %s
+        """,
+        (email,)
+    )
+
+    row = cursor.fetchone()
+
+    cursor.close()
+
+    assert row is not None
+    assert row[0] == email

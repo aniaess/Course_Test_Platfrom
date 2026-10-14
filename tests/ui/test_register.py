@@ -108,16 +108,27 @@ def test_user_cannot_register_with_existing_email(
         Messages.EMAIL_ALREADY_EXISTS
     )
 
-def test_user_cannot_register_with_too_short_password(register_page):
+@pytest.mark.parametrize(
+    "password, expected_message",
+    [
+        ("1234567", Messages.PASSWORD_TOO_SHORT),    # 7 characters - below minimum
+        ("A" * 129, Messages.PASSWORD_TOO_LONG),     # 129 characters - above maximum
+    ]
+)
+def test_user_cannot_register_with_invalid_password_length(
+    register_page,
+    password,
+    expected_message
+):
     register_page.open()
 
     register_page.register_user(
         name="Test User",
         email="test@test.pl",
-        password="1234567",
+        password=password,
     )
 
-    expect(register_page.get_message()).to_have_text(Messages.PASSWORD_TOO_SHORT)
+    expect(register_page.get_message()).to_have_text(expected_message)
 
 @pytest.mark.parametrize(
     "name, expected_message",

@@ -40,7 +40,7 @@ class User(BaseModel):
         StringConstraints(strip_whitespace=True, min_length=2, max_length=100)
     ]
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: str = Field(min_length=8, max_length=128)
 
 
 @app.get("/register")
