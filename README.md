@@ -300,6 +300,56 @@ Future development may include:
 
 ## AI-Assisted Testing
 
+The project includes a Claude Code subagent for reviewing test quality:
+
+```text
+.claude/agents/test-quality-reviewer.md
+```
+
+The `test-quality-reviewer` agent reviews API, database and UI tests for:
+
+- Requirements coverage (compared with `docs/requirements/` and `docs/registration/test_cases.md`)
+- Assertion quality
+- Boundary values
+- Test isolation and test data cleanup
+- Flakiness risks
+- Project conventions (fixtures, Page Object Model, `Messages`, docstrings)
+
+The agent is read-only and never modifies tests or application code. It returns a report with findings grouped by severity, a requirements coverage table and a list of good practices.
+
+### Running the Agent
+
+Start Claude Code in the project directory and check that the agent is available:
+
+```text
+/agents
+```
+
+Ask Claude Code to use the agent, for example:
+
+```text
+Use test-quality-reviewer to review the UI registration tests.
+
+Focus on:
+- Playwright assertions and auto-waiting
+- Page Object Model usage
+- Positive and negative registration scenarios
+- Form validation and error messages
+- Boundary cases and missing test scenarios
+- Test isolation and flakiness
+
+Compare the tests with docs/requirements/registration_requirements.md
+and docs/registration/test_cases.md.
+
+Save the report to docs/qa-reports/ui_registration_review.md.
+
+Do not modify any tests or application code.
+```
+
+The agent saves the report as a new Markdown file under `docs/qa-reports/`. It does not overwrite existing reports without permission.
+
+Without a specified scope, the agent reviews changed test files. If there are no changes, it reviews the whole `tests/` directory.
+
 ## Documentation
 
 - [Registration Requirements](docs/requirements/registration_requirements.md)

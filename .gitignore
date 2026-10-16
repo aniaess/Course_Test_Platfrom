@@ -8,3 +8,4 @@ test-report.html
 allure-results/
 allure-report/
 .env
+docs/qa-reports/
