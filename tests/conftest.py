@@ -15,6 +15,9 @@ from tests.ui.pages.register_page import RegisterPage
 logger = get_logger(__name__)
 REPORT_KEY = pytest.StashKey[TestReport]()
 
+# Every email address created by tests uses this domain.
+TEST_EMAIL_DOMAIN = "test.pl"
+
 
 @pytest.fixture
 def db_connection():
@@ -44,31 +47,48 @@ def api_client():
     return ApiClient(BASE_URL)
 
 
-@pytest.fixture
-def clean_database(db_connection):
-    """Clean test data before and after each test."""
+def delete_test_users(connection):
+    """Delete users created by tests and return the number of deleted rows."""
 
-    logger.info("Cleaning database before test")
+    cursor = connection.cursor()
 
-    cursor = db_connection.cursor()
+    cursor.execute(
+        "DELETE FROM users WHERE email LIKE %s",
+        (f"%@{TEST_EMAIL_DOMAIN}",)
+    )
 
-    cursor.execute("DELETE FROM users")
+    deleted_count = cursor.rowcount
 
-    db_connection.commit()
-
-    logger.info("Database cleaned before test")
-
-    yield
-
-    logger.info("Cleaning database after test")
-
-    cursor.execute("DELETE FROM users")
-
-    db_connection.commit()
+    connection.commit()
 
     cursor.close()
 
-    logger.info("Database cleaned after test")
+    return deleted_count
+
+
+@pytest.fixture(scope="session", autouse=True)
+def clean_test_users():
+    """
+    Delete users created by tests before and after the test session.
+
+    Only users with an email in the test domain are deleted, so real
+    accounts in the database are never removed. Cleaning before the
+    session also removes data left by interrupted runs.
+    """
+
+    connection = get_connection()
+
+    deleted_count = delete_test_users(connection)
+
+    logger.info(f"Deleted {deleted_count} test users before test session")
+
+    yield
+
+    deleted_count = delete_test_users(connection)
+
+    logger.info(f"Deleted {deleted_count} test users after test session")
+
+    connection.close()
 
 
 @pytest.fixture
@@ -86,7 +106,7 @@ def user_data():
 
     user_data = {
         "name": "Playwright User",
-        "email": f"playwright-{uuid.uuid4()}@test.pl",
+        "email": f"playwright-{uuid.uuid4()}@{TEST_EMAIL_DOMAIN}",
         "password": "secret123"
     }
 
