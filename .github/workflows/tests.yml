@@ -15,7 +15,7 @@ jobs:
 
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: course_platform
+      DB_NAME: course_platformok dodaj
       DB_USER: postgres
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
@@ -29,7 +29,7 @@ jobs:
         run: docker compose build
 
       - name: Start services
-        run: docker compose up -d
+        run: docker compose up -d --wait db api
 
       - name: Run tests
         run: docker compose run --rm tests
