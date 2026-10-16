@@ -231,15 +231,34 @@ The test container runs:
 
 ## Test Reports
 
-Pytest HTML reporting is configured in `pytest.ini`.
-
-A test report is generated as:
+Reporting is configured in `pytest.ini`. Every test run produces:
 
 ```text
-test-report.html
+test-results/
+├── test-report.html   # pytest-html report
+├── junit.xml          # JUnit XML report
+└── playwright/        # screenshots and traces of failed UI tests
+logs/
+└── test.log           # framework logs
 ```
 
-The report is excluded from Git using `.gitignore`.
+When the tests run in Docker, `test-results/` and `logs/` are mounted
+from the project directory, so the results are available after the
+container is removed.
+
+A trace of a failed UI test can be opened with:
+
+```text
+playwright show-trace test-results/playwright/<test-name>/trace.zip
+```
+
+Both directories are excluded from Git using `.gitignore`.
+
+In GitHub Actions:
+
+- A summary of the results (totals and failed tests) is shown on the workflow run page.
+- `test-results/` and `logs/` are uploaded as the `test-results` artifact
+  (kept for 14 days), also when the tests fail.
 
 ## CI/CD
 

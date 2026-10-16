@@ -4,7 +4,7 @@ __pycache__/
 .idea/
 *.pyc
 logs/
-test-report.html
+test-results/
 allure-results/
 allure-report/
 .env

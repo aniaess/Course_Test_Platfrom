@@ -15,7 +15,7 @@ jobs:
 
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: course_platformok dodaj
+      DB_NAME: course_platform
       DB_USER: postgres
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
@@ -33,3 +33,18 @@ jobs:
 
       - name: Run tests
         run: docker compose run --rm tests
+
+      - name: Write test summary
+        if: always()
+        run: python3 scripts/junit_summary.py test-results/junit.xml >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results/
+            logs/
+          if-no-files-found: warn
+          retention-days: 14

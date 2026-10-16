@@ -45,6 +45,9 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./test-results:/app/test-results
+      - ./logs:/app/logs
     depends_on:
       db:
         condition: service_healthy
