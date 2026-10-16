@@ -25,9 +25,11 @@ if (registerForm) {
         const password = document.getElementById("password").value;
 
         const message = document.getElementById("register-message");
+        const loginButton = document.getElementById("login-button");
 
         message.textContent = "";
         message.className = "";
+        loginButton.hidden = true;
 
         if (!name) {
             message.textContent = "Name cannot be empty.";
@@ -105,6 +107,17 @@ if (registerForm) {
         if (response.status === 201) {
             message.textContent = "Registration successful!";
             message.className = "success-message";
+
+            registerForm.reset();
+
+            // Hide the password again in case it was shown before submitting.
+            if (passwordToggle) {
+                document.getElementById("password").type = "password";
+                passwordToggle.setAttribute("aria-pressed", "false");
+                passwordToggle.setAttribute("aria-label", "Show password");
+            }
+
+            loginButton.hidden = false;
         } else if (response.status === 409 && data) {
             message.textContent = data.detail;
             message.className = "error-message";

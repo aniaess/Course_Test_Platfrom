@@ -15,6 +15,7 @@ class RegisterPage(BasePage):
         self.password_input = page.locator("#password")
         self.register_button = page.locator('#register-form button[type="submit"]')
         self.register_message = page.locator("#register-message")
+        self.login_button = page.locator("#login-button")
 
     def open(self):
         """Open the registration page."""

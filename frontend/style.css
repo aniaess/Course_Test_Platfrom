@@ -346,6 +346,16 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
+a.primary-button {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
+.primary-button[hidden] {
+    display: none;
+}
+
 .primary-button:hover {
     filter: brightness(1.08);
     transform: translateY(-1px);

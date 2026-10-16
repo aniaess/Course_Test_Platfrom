@@ -15,10 +15,39 @@ def test_user_can_register_successfully(
 
     The registration form is completed with a valid name, email address,
     and password. After submitting the form, the test verifies that
-    the expected success message is displayed to the user.
+    the expected success message is displayed, the form is cleared
+    and the "Log in" button is shown.
 
     This test covers the main registration flow from the UI through
     the frontend and API to the database.
+    """
+
+    register_page.open()
+
+    expect(register_page.login_button).to_be_hidden()
+
+    register_page.register_user(
+        name=user_data["name"],
+        email=user_data["email"],
+        password=user_data["password"]
+    )
+
+    expect(register_page.get_message()).to_have_text(
+        Messages.REGISTRATION_SUCCESS
+    )
+    expect(register_page.name_input).to_have_value("")
+    expect(register_page.email_input).to_have_value("")
+    expect(register_page.password_input).to_have_value("")
+    expect(register_page.login_button).to_be_visible()
+
+
+def test_user_can_go_to_login_page_after_registration(
+    register_page,
+    user_data
+):
+    """
+    Verify that the "Log in" button shown after a successful
+    registration opens the login page.
     """
 
     register_page.open()
@@ -29,9 +58,9 @@ def test_user_can_register_successfully(
         password=user_data["password"]
     )
 
-    expect(register_page.get_message()).to_have_text(
-        "Registration successful!"
-    )
+    register_page.login_button.click()
+
+    expect(register_page.page).to_have_title("Login - Course Platform")
 
 @pytest.mark.parametrize(
     "name, email, password, expected_message",
@@ -107,6 +136,8 @@ def test_user_cannot_register_with_existing_email(
     expect(register_page.get_message()).to_have_text(
         Messages.EMAIL_ALREADY_EXISTS
     )
+    expect(register_page.email_input).to_have_value(user_data["email"])
+    expect(register_page.login_button).to_be_hidden()
 
 @pytest.mark.parametrize(
     "password, expected_message",

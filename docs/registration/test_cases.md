@@ -9,7 +9,7 @@ Each test case is mapped to the automated test that covers it.
 
 | ID | Title | Test data | Expected result | Automated test |
 |---|---|---|---|---|
-| REG-UI-01 | Successful registration | Valid name, unique email, valid password | Message "Registration successful!" is displayed | `tests/ui/test_register.py::test_user_can_register_successfully` |
+| REG-UI-01 | Successful registration | Valid name, unique email, valid password | Message "Registration successful!" is displayed, the form is cleared and the "Log in" button is shown | `tests/ui/test_register.py::test_user_can_register_successfully` |
 | REG-UI-02 | Empty name | name = "" | Message "Name cannot be empty." | `tests/ui/test_register.py::test_user_cannot_register_with_empty_required_field` |
 | REG-UI-03 | Empty email | email = "" | Message "Email cannot be empty." | `tests/ui/test_register.py::test_user_cannot_register_with_empty_required_field` |
 | REG-UI-04 | Empty password | password = "" | Message "Password cannot be empty." | `tests/ui/test_register.py::test_user_cannot_register_with_empty_required_field` |
@@ -20,6 +20,7 @@ Each test case is mapped to the automated test that covers it.
 | REG-UI-09 | Connection failure | Registration request aborted (mocked) | Message "Cannot connect to the server. Please check your connection." | `tests/ui/test_register.py::test_user_sees_error_message_when_connection_fails` |
 | REG-UI-10 | Name too long | name = 101 characters | Message "Name is too long." | `tests/ui/test_register.py::test_user_cannot_register_with_invalid_name_length` |
 | REG-UI-11 | Password too long | password = 129 characters | Message "Password must be at most 128 characters long." | `tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length` |
+| REG-UI-12 | Go to login after registration | Valid name, unique email, valid password; click "Log in" | Login page is opened | `tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration` |
 
 ## 2. API
 

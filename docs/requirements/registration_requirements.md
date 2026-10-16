@@ -84,6 +84,11 @@ the request and displays one of the following messages:
 
 - The success message uses the `success-message` style;
   all other messages use the `error-message` style.
+- After a successful registration the form is cleared
+  and a "Log in" button linking to the login page is displayed.
+  There is no automatic redirect.
+- After a failed registration the form keeps the entered data
+  and the "Log in" button is not displayed.
 
 ## 8. Data Integrity and Security
 

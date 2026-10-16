@@ -1,4 +1,6 @@
 class Messages:
+    REGISTRATION_SUCCESS = "Registration successful!"
+
     NAME_REQUIRED = "Name cannot be empty."
     NAME_TOO_SHORT = "Name is too short."
     NAME_TOO_LONG = "Name is too long."
