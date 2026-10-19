@@ -259,8 +259,10 @@ In GitHub Actions:
 
 - A summary of the results (totals and failed tests) is shown on the workflow run page.
 - `scripts/collect_test_failures.py` writes `test-results/failures.json`: for every
-  failed test the message, traceback, its logs and the paths of Playwright
-  screenshots and traces. Long texts are shortened and passwords are masked.
+  failed test the covered test cases with the expected result (from
+  `docs/**/test_cases.md`), the message, traceback, source code of the test,
+  its logs and the paths of Playwright screenshots and traces. Long texts are
+  shortened and passwords are masked.
 - `test-results/` and `logs/` are uploaded as the `test-results` artifact
   (kept for 14 days), also when the tests fail.
 - `failures.json` is also uploaded alone as the small `failures` artifact.
