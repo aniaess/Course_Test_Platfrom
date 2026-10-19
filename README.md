@@ -236,7 +236,8 @@ Reporting is configured in `pytest.ini`. Every test run produces:
 ```text
 test-results/
 ├── test-report.html   # pytest-html report
-├── junit.xml          # JUnit XML report
+├── junit.xml          # JUnit XML report (with logs of every test)
+├── failures.json      # failed tests for AI analysis (created in CI)
 └── playwright/        # screenshots and traces of failed UI tests
 logs/
 └── test.log           # framework logs
@@ -257,6 +258,9 @@ Both directories are excluded from Git using `.gitignore`.
 In GitHub Actions:
 
 - A summary of the results (totals and failed tests) is shown on the workflow run page.
+- `scripts/collect_test_failures.py` writes `test-results/failures.json`: for every
+  failed test the message, traceback, its logs and the paths of Playwright
+  screenshots and traces. Long texts are shortened and passwords are masked.
 - `test-results/` and `logs/` are uploaded as the `test-results` artifact
   (kept for 14 days), also when the tests fail.
 
