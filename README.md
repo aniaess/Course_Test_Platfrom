@@ -263,6 +263,7 @@ In GitHub Actions:
   screenshots and traces. Long texts are shortened and passwords are masked.
 - `test-results/` and `logs/` are uploaded as the `test-results` artifact
   (kept for 14 days), also when the tests fail.
+- `failures.json` is also uploaded alone as the small `failures` artifact.
 
 ## CI/CD
 
