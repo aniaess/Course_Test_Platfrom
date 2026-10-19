@@ -60,7 +60,8 @@ def test_user_can_go_to_login_page_after_registration(
 
     register_page.login_button.click()
 
-    expect(register_page.page).to_have_title("Login - Course Platform")
+    # TEMP: intentional failure to check failures.json in CI.
+    expect(register_page.page).to_have_title("Dashboard - Course Platform")
 
 @pytest.mark.parametrize(
     "name, email, password, expected_message",

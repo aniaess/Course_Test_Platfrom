@@ -20,7 +20,8 @@ def test_create_user(api_client, user_data):
         json=user_data
     )
 
-    assert response.status_code == 201
+    # TEMP: intentional failure to check failures.json in CI.
+    assert response.status_code == 200
 
     response_data = response.json()
 
