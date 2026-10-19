@@ -34,6 +34,12 @@ jobs:
       - name: Run tests
         run: docker compose run --rm tests
 
+      # The tests container creates these folders as root, so scripts
+      # running on the runner could not write to them.
+      - name: Fix ownership of test results
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" test-results logs
+
       - name: Write test summary
         if: always()
         run: python3 scripts/junit_summary.py test-results/junit.xml >> "$GITHUB_STEP_SUMMARY"
