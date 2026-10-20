@@ -5,7 +5,7 @@ Usage: python scripts/collect_test_failures.py [junit.xml] [output.json]
 Defaults: test-results/junit.xml -> test-results/failures.json
 
 For every failed test the JSON contains the test cases it covers (with
-the expected result, from docs/**/test_cases.md), the error message,
+the expected result, from docs/test-cases/*.md), the error message,
 the end of the traceback, the source code of the test, the logs
 captured for that test and the paths of the Playwright screenshot and
 trace. The file is the input for the AI analysis of test failures, so
@@ -28,7 +28,7 @@ MAX_TRACEBACK_LINES = 60
 MAX_LOG_LINES = 80
 MAX_CODE_LINES = 120
 
-TEST_CASES_GLOB = "docs/**/test_cases.md"
+TEST_CASES_GLOB = "docs/test-cases/*.md"
 
 SECRET_ENV_VARS = ("DB_PASSWORD", "POSTGRES_PASSWORD", "ANTHROPIC_API_KEY")
 
@@ -143,7 +143,7 @@ def strip_parameters(test_id: str) -> str:
 
 def load_test_cases() -> dict[str, list[dict]]:
     """
-    Read the test case tables from docs/**/test_cases.md.
+    Read the test case tables from docs/test-cases/*.md.
 
     Returns the test cases grouped by the automated test that covers
     them. A parametrized test usually covers several test cases.

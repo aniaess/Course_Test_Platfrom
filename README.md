@@ -260,7 +260,7 @@ In GitHub Actions:
 - A summary of the results (totals and failed tests) is shown on the workflow run page.
 - `scripts/collect_test_failures.py` writes `test-results/failures.json`: for every
   failed test the covered test cases with the expected result (from
-  `docs/**/test_cases.md`), the message, traceback, source code of the test,
+  `docs/test-cases/*.md`), the message, traceback, source code of the test,
   its logs and the paths of Playwright screenshots and traces. Long texts are
   shortened and passwords are masked.
 - `test-results/` and `logs/` are uploaded as the `test-results` artifact
@@ -334,7 +334,7 @@ The project includes a Claude Code subagent for reviewing test quality:
 
 The `test-quality-reviewer` agent reviews API, database and UI tests for:
 
-- Requirements coverage (compared with `docs/requirements/` and `docs/registration/test_cases.md`)
+- Requirements coverage (compared with `docs/requirements/` and `docs/test-cases/registration.md`)
 - Assertion quality
 - Boundary values
 - Test isolation and test data cleanup
@@ -365,7 +365,7 @@ Focus on:
 - Test isolation and flakiness
 
 Compare the tests with docs/requirements/registration_requirements.md
-and docs/registration/test_cases.md.
+and docs/test-cases/registration.md.
 
 Save the report to docs/qa-reports/ui_registration_review.md.
 
@@ -379,4 +379,4 @@ Without a specified scope, the agent reviews changed test files. If there are no
 ## Documentation
 
 - [Registration Requirements](docs/requirements/registration_requirements.md)
-- [Registration Test Cases](docs/registration/test_cases.md)
+- [Registration Test Cases](docs/test-cases/registration.md)
