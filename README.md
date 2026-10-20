@@ -265,7 +265,22 @@ In GitHub Actions:
   shortened and passwords are masked.
 - `test-results/` and `logs/` are uploaded as the `test-results` artifact
   (kept for 14 days), also when the tests fail.
-- `failures.json` is also uploaded alone as the small `failures` artifact.
+- When tests fail, `scripts/failure_analyzer.py` sends `failures.json` to the
+  Claude API. For every failed test Claude names the category (application bug,
+  test bug, environment issue, flaky test, insufficient evidence), the observed
+  and expected behavior, the evidence, the possible root cause and the
+  recommended next steps. The report `test-results/failure_analysis.md` is shown on the
+  workflow run page. It needs the `ANTHROPIC_API_KEY` repository secret; without
+  it the step is skipped.
+- `failures.json` and `failure_analysis.md` are also uploaded alone as the small
+  `failures` artifact.
+
+To run the analysis locally:
+
+```text
+pip install -r scripts/requirements.txt
+python scripts/failure_analyzer.py test-results/failures.json test-results/failure_analysis.md
+```
 
 ## CI/CD
 

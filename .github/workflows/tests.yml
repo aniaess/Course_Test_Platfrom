@@ -48,6 +48,24 @@ jobs:
         if: always()
         run: python3 scripts/collect_test_failures.py test-results/junit.xml test-results/failures.json
 
+      # The system Python of the runner does not allow pip install.
+      - name: Set up Python
+        if: failure()
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Analyze test failures with AI
+        if: failure()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pip install -r scripts/requirements.txt
+          python scripts/failure_analyzer.py test-results/failures.json test-results/failure_analysis.md
+          if [ -f test-results/failure_analysis.md ]; then
+            cat test-results/failure_analysis.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -64,6 +82,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: failures
-          path: test-results/failures.json
+          path: |
+            test-results/failures.json
+            test-results/failure_analysis.md
           if-no-files-found: warn
           retention-days: 14
