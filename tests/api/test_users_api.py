@@ -20,7 +20,7 @@ def test_create_user(api_client, user_data):
         json=user_data
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     response_data = response.json()
 
