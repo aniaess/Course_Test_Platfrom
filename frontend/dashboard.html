@@ -4,31 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard - Course Platform</title>
+    <title>Dashboard - AI Academy</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="auth-page app-page">
 
-<header class="navbar">
+<header class="auth-header">
 
-    <div class="logo">
-        Course Platform
-    </div>
+    <a class="brand" href="index.html">
+        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 2.5 12.2 8.8 18.5 11l-6.3 2.2L10 19.5l-2.2-6.3L1.5 11l6.3-2.2L10 2.5z"/>
+            <path d="m19 14 1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5z"/>
+        </svg>
+        AI Academy
+    </a>
 
-    <nav>
+    <nav class="auth-nav">
         <a href="index.html">Home</a>
+        <a class="nav-button" href="index.html">Log out</a>
     </nav>
 
 </header>
 
+<main class="app-main">
 
-<main class="hero">
+    <section class="dashboard-intro">
+        <p class="promo-eyebrow">6 courses</p>
+        <h1 class="promo-title">
+            Welcome to your
+            <span>dashboard</span>
+        </h1>
+        <p class="promo-text">
+            Choose a course and start learning &ndash; from the foundations
+            of AI to production-ready applications.
+        </p>
+    </section>
 
-    <h1>Welcome to your dashboard!</h1>
+    <ul class="course-grid">
 
-    <p>Your courses will appear here.</p>
+        <li class="course-card" id="course-1">
+            <span class="course-number">01</span>
+            <h2>AI Foundations</h2>
+            <p class="course-tagline">Understand artificial intelligence</p>
+            <ul class="course-topics">
+                <li>
+                    <strong>AI from scratch &ndash; how artificial intelligence really works</strong>
+                    AI, machine learning, deep learning, neural networks, training and prediction.
+                </li>
+                <li>
+                    <strong>The math behind AI</strong>
+                    Vectors, matrices, probability, derivatives and the intuition behind gradient descent.
+                </li>
+                <li>
+                    <strong>Python for artificial intelligence</strong>
+                    NumPy, data processing, basic models and experiments.
+                </li>
+            </ul>
+            <span class="course-status">Not started</span>
+        </li>
+
+        <li class="course-card" id="course-2">
+            <span class="course-number">02</span>
+            <h2>LLM Engineering</h2>
+            <p class="course-tagline">Understand language models</p>
+            <ul class="course-topics">
+                <li>
+                    <strong>Inside LLMs &ndash; how ChatGPT works</strong>
+                    Tokenization, embeddings, attention, the Transformer architecture and text generation.
+                </li>
+                <li>
+                    <strong>Working with LLM APIs</strong>
+                    Using models, prompt engineering, context, generation parameters and structured outputs.
+                </li>
+                <li>
+                    <strong>Fine-tuning and model customization</strong>
+                    Training data, fine-tuning, LoRA, open models and running models locally.
+                </li>
+            </ul>
+            <span class="course-status">Not started</span>
+        </li>
+
+        <li class="course-card" id="course-3">
+            <span class="course-number">03</span>
+            <h2>RAG &amp; Knowledge Systems</h2>
+            <p class="course-tagline">Give AI access to knowledge</p>
+            <ul class="course-topics">
+                <li>
+                    <strong>Embeddings and vector databases</strong>
+                    Text representations, semantic similarity, search and indexing.
+                </li>
+                <li>
+                    <strong>RAG from scratch &ndash; a chatbot with your own knowledge base</strong>
+                    Chunking, retrieval, reranking, sources and generating answers grounded in documents.
+                </li>
+                <li>
+                    <strong>AI memory and context management</strong>
+                    Conversation history, summarization, long-term memory and storing user information.
+                </li>
+            </ul>
+            <span class="course-status">Not started</span>
+        </li>
+
+        <li class="course-card" id="course-4">
+            <span class="course-number">04</span>
+            <h2>AI Agents Engineering</h2>
+            <p class="course-tagline">Build autonomous systems</p>
+            <ul class="course-topics">
+                <li>
+                    <strong>From chatbot to AI agent</strong>
+                    Tools, function calling, the action loop, planning and observing results.
+                </li>
+                <li>
+                    <strong>ReAct and designing agent workflows</strong>
+                    Combining reasoning with action, error handling and loop control.
+                </li>
+                <li>
+                    <strong>LangGraph &ndash; agents as graphs</strong>
+                    State, nodes, edges, conditions, checkpoints and resuming work.
+                </li>
+                <li>
+                    <strong>Multi-agent systems</strong>
+                    Role separation, agent coordination, task handoffs and judging whether multiple agents really help.
+                </li>
+            </ul>
+            <span class="course-status">Not started</span>
+        </li>
+
+        <li class="course-card" id="course-5">
+            <span class="course-number">05</span>
+            <h2>AI Safety &amp; Evaluation</h2>
+            <p class="course-tagline">Test, secure and trust wisely</p>
+            <ul class="course-topics">
+                <li>
+                    <strong>Hallucinations and the limits of LLMs</strong>
+                    Where errors come from, why models sound convincing and how to verify their answers.
+                </li>
+                <li>
+                    <strong>Security of AI applications</strong>
+                    Prompt injection, data leaks, dangerous tools and attacks on RAG systems.
+                </li>
+                <li>
+                    <strong>AI evaluation and monitoring</strong>
+                    Test sets, answer quality, RAG evaluation, regressions, logging and production monitoring.
+                </li>
+                <li>
+                    <strong>Societal risks and the future of AI</strong>
+                    Deepfakes, manipulation, privacy, the job market, concentration of power and the risks of advanced autonomy.
+                </li>
+            </ul>
+            <span class="course-status">Not started</span>
+        </li>
+
+        <li class="course-card" id="course-6">
+            <span class="course-number">06</span>
+            <h2>AI Product Builder</h2>
+            <p class="course-tagline">Turn knowledge into a working product</p>
+            <ul class="course-topics">
+                <li>
+                    <strong>Building an AI application from A to Z</strong>
+                    Backend, user interface, model APIs, database, authentication and deployment.
+                </li>
+                <li>
+                    <strong>Production AI systems</strong>
+                    Costs, latency, caching, privacy, reliability and error handling.
+                </li>
+            </ul>
+            <span class="course-status">Not started</span>
+        </li>
+
+    </ul>
 
 </main>
 

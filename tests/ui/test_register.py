@@ -60,7 +60,7 @@ def test_user_can_go_to_login_page_after_registration(
 
     register_page.login_button.click()
 
-    expect(register_page.page).to_have_title("Login - Course Platform")
+    expect(register_page.page).to_have_title("Login - AI Academy")
 
 @pytest.mark.parametrize(
     "name, email, password, expected_message",
