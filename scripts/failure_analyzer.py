@@ -217,6 +217,9 @@ def main():
     input_path = Path(sys.argv[1] if len(sys.argv) > 1 else "test-results/failures.json")
     output_path = Path(sys.argv[2] if len(sys.argv) > 2 else "test-results/failure_analysis.md")
 
+    # A report left from an earlier run would describe failures that are already fixed.
+    output_path.unlink(missing_ok=True)
+
     if not input_path.exists():
         print(f"Failures file not found: {input_path}")
         return
