@@ -1,0 +1,58 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0,
+    "tests": [
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user",
+        "status": "failed"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user",
+      "type": "api",
+      "status": "failed",
+      "time": 0.097,
+      "test_cases": [
+        {
+          "id": "REG-API-01",
+          "title": "Successful registration",
+          "test_data": "Valid name, unique email, valid password",
+          "expected_result": "HTTP 201"
+        }
+      ],
+      "message": "assert 500 == 201\n +  where 500 = <Response [500]>.status_code",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x7bf10898b230>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-fd339aa5-d338-43a4-a360-6f13750314b3@test.pl', 'password': '***'}\n\n    def test_create_user(api_client, user_data):\n        \"\"\"\n        Verify that a new user can be successfully created through the API.\n    \n        The test sends valid user data to the POST /users endpoint and\n        verifies that the API returns HTTP 201 Created.\n    \n        The response is also checked to ensure that the created user's\n        name and email match the data sent in the request.\n        \"\"\"\n    \n        response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n>       assert response.status_code == 201\nE       assert 500 == 201\nE        +  where 500 = <Response [500]>.status_code\n\ntests/api/test_users_api.py:23: AssertionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 7,
+        "source": "def test_create_user(api_client, user_data):\n    \"\"\"\n    Verify that a new user can be successfully created through the API.\n\n    The test sends valid user data to the POST /users endpoint and\n    verifies that the API returns HTTP 201 Created.\n\n    The response is also checked to ensure that the created user's\n    name and email match the data sent in the request.\n    \"\"\"\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n\n    response_data = response.json()\n\n    assert response_data[\"name\"] == user_data[\"name\"]\n    assert response_data[\"email\"] == user_data[\"email\"]"
+      },
+      "logs": [
+        "2026-10-26 12:32:03,967 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 12:32:03,991 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 12:32:04,000 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-26 12:32:04,005 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user",
+        "2026-10-26 12:32:04,007 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 12:32:04,009 | INFO | conftest | Generated test user data for email: playwright-fd339aa5-d338-43a4-a360-6f13750314b3@test.pl",
+        "2026-10-26 12:32:04,010 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 12:32:04,043 | INFO | tests.api.client.api_client | Response status: 500",
+        "2026-10-26 12:32:04,137 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user",
+        "2026-10-26 12:32:04,140 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user",
+        "2026-10-26 12:32:04,147 | INFO | conftest | Deleted 0 test users after test session"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

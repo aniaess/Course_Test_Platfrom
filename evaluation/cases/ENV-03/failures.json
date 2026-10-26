@@ -1,0 +1,43 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 0,
+    "error": 1,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/db/test_users_db.py::test_created_user_is_persisted_in_database",
+      "type": "db",
+      "status": "error",
+      "time": 0.026,
+      "test_cases": [
+        {
+          "id": "REG-DB-01",
+          "title": "User is persisted",
+          "test_data": "User created through the API",
+          "expected_result": "Row with matching name and email exists in `users`"
+        }
+      ],
+      "message": "failed on setup with \"psycopg2.errors.UndefinedTable: relation \"users\" does not exist\nLINE 1: DELETE FROM users WHERE email LIKE '%@test.pl'\n                    ^\"",
+      "traceback": "@pytest.fixture(scope=\"session\", autouse=True)\n    def clean_test_users():\n        \"\"\"\n        Delete users created by tests before and after the test session.\n    \n        Only users with an email in the test domain are deleted, so real\n        accounts in the database are never removed. Cleaning before the\n        session also removes data left by interrupted runs.\n        \"\"\"\n    \n        connection = get_connection()\n    \n>       deleted_count = delete_test_users(connection)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/conftest.py:81: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nconnection = <connection object at 0x7a711531e0c0; dsn: 'user=postgres password=*** dbname=course_platform host=db port=5432', closed: 0>\n\n    def delete_test_users(connection):\n        \"\"\"Delete users created by tests and return the number of deleted rows.\"\"\"\n    \n        cursor = connection.cursor()\n    \n>       cursor.execute(\n            \"DELETE FROM users WHERE email LIKE %s\",\n            (f\"%@{TEST_EMAIL_DOMAIN}\",)\n        )\nE       psycopg2.errors.UndefinedTable: relation \"users\" does not exist\nE       LINE 1: DELETE FROM users WHERE email LIKE '%@test.pl'\nE                           ^\n\ntests/conftest.py:55: UndefinedTable",
+      "test_code": {
+        "file": "tests/db/test_users_db.py",
+        "line": 10,
+        "source": "def test_created_user_is_persisted_in_database(\n    api_client,\n    db_connection,\n    user_data\n):\n    \"\"\"\n    Verify that a successfully created user is persisted in the database.\n\n    The test creates a user through the API and then queries the database\n    to verify that the user's name and email were stored correctly.\n    \"\"\"\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n\n    cursor = db_connection.cursor()\n\n    cursor.execute(\n        \"\"\"\n        SELECT name, email\n        FROM users\n        WHERE email = %s\n        \"\"\",\n        (user_data[\"email\"],)\n    )\n\n    user = cursor.fetchone()\n\n    assert user is not None\n    assert user[0] == user_data[\"name\"]\n    assert user[1] == user_data[\"email\"]"
+      },
+      "logs": [
+        "2026-10-26 10:43:28,416 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 10:43:28,435 | INFO | app.database | PostgreSQL database connection established"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

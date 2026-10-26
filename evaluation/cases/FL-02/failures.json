@@ -1,0 +1,61 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/ui/test_register.py::test_user_cannot_register_with_existing_email[chromium]",
+      "type": "ui",
+      "status": "failed",
+      "time": 5.642,
+      "test_cases": [
+        {
+          "id": "REG-UI-05",
+          "title": "Existing email",
+          "test_data": "Email of an already registered user",
+          "expected_result": "Message \"User with this email already exists\""
+        }
+      ],
+      "message": "AssertionError: Locator expected to have text 'User with this email already exists'\nActual value:  \nCall log:\n  - Expect \"to_have_text\" locator(\"#register-message\") with timeout 100ms\n  - waiting for locator(\"#register-message\")\n\nAria snapshot:\n- banner:\n  - link \"AI Academy\":\n    - /url: index.html\n  - navigation:\n    - link \"Home\":\n      - /url: index.html\n    - link \"Log in\":\n      - /url: login.html\n- main:\n  - paragraph: AI · LLMs · Agents · Safety\n  - heading \"Master AI, from theory to product\" [level=1]\n  - paragraph: Hands-on AI courses – from how neural networks work to secure, tested AI applications. Every course follows the same four steps.\n  - list:\n    - listitem:\n      - strong: Understand\n      - text: I can explain how it works.\n    - listitem:\n      - strong: Build\n      - text: I can write code that works.\n    - listitem:\n      - strong: Test\n      - text: I know whether my solution works correctly.\n    - listitem:\n      - strong: Secure\n      - text: I understand the risks and how to reduce them.\n  - heading \"Create your account\" [level=1]\n  - paragraph: Sign up and start your AI learning path today.\n  - text: Name\n  - textbox \"Name\":\n    - /placeholder: Enter your name\n    - text: Another User\n  - text: Email address\n  - textbox \"Email address\":\n    - /placeholder: Enter your email address\n    - text: playwright-b62107a9-e806-428e-8439-c0e9df046307@test.pl\n  - text: Password\n  - textbox \"Password\":\n    - /placeholder: Enter your password\n    - text: anotherpassword123\n  - button \"Show password\"\n  - button \"Create account\"\n  - paragraph:\n    - text: Already have an account?\n    - link \"Log in\":\n      - /url: login.html",
+      "traceback": "... (36 lines skipped)\n        )\n    \n        # Assert\n>       expect(register_page.get_message()).to_have_text(\n            Messages.EMAIL_ALREADY_EXISTS, timeout=100\n        )\nE       AssertionError: Locator expected to have text 'User with this email already exists'\nE       Actual value:  \nE       Call log:\nE         - Expect \"to_have_text\" locator(\"#register-message\") with timeout 100ms\nE         - waiting for locator(\"#register-message\")\nE       \nE       Aria snapshot:\nE       - banner:\nE         - link \"AI Academy\":\nE           - /url: index.html\nE         - navigation:\nE           - link \"Home\":\nE             - /url: index.html\nE           - link \"Log in\":\nE             - /url: login.html\nE       - main:\nE         - paragraph: AI · LLMs · Agents · Safety\nE         - heading \"Master AI, from theory to product\" [level=1]\nE         - paragraph: Hands-on AI courses – from how neural networks work to secure, tested AI applications. Every course follows the same four steps.\nE         - list:\nE           - listitem:\nE             - strong: Understand\nE             - text: I can explain how it works.\nE           - listitem:\nE             - strong: Build\nE             - text: I can write code that works.\nE           - listitem:\nE             - strong: Test\nE             - text: I know whether my solution works correctly.\nE           - listitem:\nE             - strong: Secure\nE             - text: I understand the risks and how to reduce them.\nE         - heading \"Create your account\" [level=1]\nE         - paragraph: Sign up and start your AI learning path today.\nE         - text: Name\nE         - textbox \"Name\":\nE           - /placeholder: Enter your name\nE           - text: Another User\nE         - text: Email address\nE         - textbox \"Email address\":\nE           - /placeholder: Enter your email address\nE           - text: playwright-b62107a9-e806-428e-8439-c0e9df046307@test.pl\nE         - text: Password\nE         - textbox \"Password\":\nE           - /placeholder: Enter your password\nE           - text: anotherpassword123\nE         - button \"Show password\"\nE         - button \"Create account\"\nE         - paragraph:\nE           - text: Already have an account?\nE           - link \"Log in\":\nE             - /url: login.html\n\ntests/ui/test_register.py:136: AssertionError",
+      "test_code": {
+        "file": "tests/ui/test_register.py",
+        "line": 101,
+        "source": "def test_user_cannot_register_with_existing_email(\n    register_page,\n    api_client,\n    user_data\n):\n    \"\"\"\n    Verify that a user cannot register with an email address\n    that is already registered.\n\n    An existing user is created through the API as test data.\n    The test then attempts to register another user through the UI\n    using the same email address.\n\n    The test verifies that the expected duplicate-email error message\n    is displayed to the user.\n    \"\"\"\n\n    # Arrange - create an existing user through the API\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n\n    # Act - try to register through the UI with the same email\n    register_page.open()\n\n    register_page.register_user(\n        name=\"Another User\",\n        email=user_data[\"email\"],\n        password=\"anotherpassword123\"\n    )\n\n    # Assert\n    expect(register_page.get_message()).to_have_text(\n        Messages.EMAIL_ALREADY_EXISTS, timeout=100\n    )\n    expect(register_page.email_input).to_have_value(user_data[\"email\"])\n    expect(register_page.login_button).to_be_hidden()"
+      },
+      "logs": [
+        "2026-10-26 11:49:17,470 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 11:49:17,493 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 11:49:17,502 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-26 11:49:19,084 | INFO | conftest | START TEST: tests/ui/test_register.py::test_user_cannot_register_with_existing_email[chromium]",
+        "2026-10-26 11:49:19,325 | INFO | conftest | Creating RegisterPage",
+        "2026-10-26 11:49:19,332 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 11:49:19,336 | INFO | conftest | Generated test user data for email: playwright-b62107a9-e806-428e-8439-c0e9df046307@test.pl",
+        "2026-10-26 11:49:19,340 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 11:49:19,925 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-26 11:49:19,936 | INFO | tests.ui.pages.base_page | Opening page: http://api:8000/register",
+        "2026-10-26 11:49:20,713 | INFO | tests.ui.pages.base_page | Registering user with email: playwright-b62107a9-e806-428e-8439-c0e9df046307@test.pl",
+        "2026-10-26 11:49:21,990 | INFO | tests.ui.pages.base_page | Registration form submitted",
+        "2026-10-26 11:49:21,992 | INFO | tests.ui.pages.base_page | Getting registration message",
+        "2026-10-26 11:49:23,141 | ERROR | conftest | TEST FAILED: tests/ui/test_register.py::test_user_cannot_register_with_existing_email[chromium]",
+        "2026-10-26 11:49:23,147 | INFO | conftest | END TEST: tests/ui/test_register.py::test_user_cannot_register_with_existing_email[chromium]",
+        "2026-10-26 11:49:23,288 | INFO | conftest | Deleted 1 test users after test session"
+      ],
+      "artifacts": {
+        "screenshots": [
+          "test-results/playwright/tests-ui-test-register-py-test-user-cannot-register-with-existing-email-chromium/test-failed-1.png"
+        ],
+        "traces": [
+          "test-results/playwright/tests-ui-test-register-py-test-user-cannot-register-with-existing-email-chromium/trace.zip"
+        ]
+      }
+    }
+  ]
+}

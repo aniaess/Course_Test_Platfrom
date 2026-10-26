@@ -1,0 +1,42 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 0,
+    "error": 1,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/db/test_users_db.py::test_users_table_has_expected_columns",
+      "type": "db",
+      "status": "error",
+      "time": 0.02,
+      "test_cases": [
+        {
+          "id": "REG-DB-04",
+          "title": "Table structure",
+          "test_data": "-",
+          "expected_result": "`users` table has the expected columns"
+        }
+      ],
+      "message": "failed on setup with \"psycopg2.OperationalError: connection to server at \"db\" (172.20.0.2), port 5432 failed: FATAL:  password authentication failed for user \"postgres\"\"",
+      "traceback": "... (10 lines skipped)\n>       connection = get_connection()\n                     ^^^^^^^^^^^^^^^^\n\ntests/conftest.py:79: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \napp/database.py:18: in get_connection\n    connection = psycopg2.connect(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\ndsn = 'host=db port=5432 user=postgres password=*** dbname=course_platform'\nconnection_factory = None, cursor_factory = None\nkwargs = {'host': 'db', 'port': '5432', 'database': 'course_platform', 'user': 'postgres', ...}\n\n    def connect(dsn=None, connection_factory=None, cursor_factory=None, **kwargs):\n        \"\"\"\n        Create a new database connection.\n    \n        The connection parameters can be specified as a string:\n    \n            conn = psycopg2.connect(\"dbname=test user=postgres password=***\")\n    \n        or using a set of keyword arguments:\n    \n            conn = psycopg2.connect(database=\"test\", user=\"postgres\", password=\"***\")\n    \n        Or as a mix of both. The basic connection parameters are:\n    \n        - *dbname*: the database name\n        - *database*: the database name (only as keyword argument)\n        - *user*: user name used to authenticate\n        - *password*: password used to authenticate\n        - *host*: database host address (defaults to UNIX socket if not provided)\n        - *port*: connection port number (defaults to 5432 if not provided)\n    \n        Using the *connection_factory* parameter a different class or connections\n        factory can be specified. It should be a callable object taking a dsn\n        argument.\n    \n        Using the *cursor_factory* parameter, a new default cursor factory will be\n        used by cursor().\n    \n        Using *async*=True an asynchronous connection will be created. *async_* is\n        a valid alias (for Python versions where ``async`` is a keyword).\n    \n        Any other keyword parameter will be passed to the underlying client\n        library: the list of supported parameters depends on the library version.\n    \n        \"\"\"\n        kwasync = {}\n        if 'async' in kwargs:\n            kwasync['async'] = kwargs.pop('async')\n        if 'async_' in kwargs:\n            kwasync['async_'] = kwargs.pop('async_')\n    \n        dsn = _ext.make_dsn(dsn, **kwargs)\n>       conn = _connect(dsn, connection_factory=connection_factory, **kwasync)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       psycopg2.OperationalError: connection to server at \"db\" (172.20.0.2), port 5432 failed: FATAL:  password authentication failed for user \"postgres\"\n\n/usr/local/lib/python3.14/site-packages/psycopg2/__init__.py:122: OperationalError",
+      "test_code": {
+        "file": "tests/db/test_users_db.py",
+        "line": 145,
+        "source": "def test_users_table_has_expected_columns(db_connection):\n    \"\"\"\n    Verify that the users table contains the expected columns and\n    data types.\n\n    The test queries PostgreSQL information_schema and verifies that\n    the users table contains the required columns with the expected\n    data types.\n    \"\"\"\n\n    cursor = db_connection.cursor()\n\n    cursor.execute(\n        \"\"\"\n        SELECT column_name, data_type, character_maximum_length\n        FROM information_schema.columns\n        WHERE table_name = 'users'\n        ORDER BY ordinal_position\n        \"\"\"\n    )\n\n    columns = cursor.fetchall()\n\n    expected_columns = [\n        (\"id\", \"integer\", None),\n        (\"name\", \"character varying\", 100),\n        (\"email\", \"character varying\", 255),\n        (\"password\", \"character varying\", 255),\n    ]\n\n    assert columns == expected_columns"
+      },
+      "logs": [
+        "2026-10-26 10:39:36,861 | INFO | app.database | Connecting to PostgreSQL database"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

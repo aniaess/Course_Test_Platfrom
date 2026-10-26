@@ -1,0 +1,52 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user_trims_name_whitespace",
+      "type": "api",
+      "status": "failed",
+      "time": 0.24,
+      "test_cases": [
+        {
+          "id": "REG-API-10",
+          "title": "Name whitespace is trimmed",
+          "test_data": "name = \"  Test User  \"",
+          "expected_result": "HTTP 201, response name is \"Test User\""
+        }
+      ],
+      "message": "AssertionError: assert '  Test User  ' == 'Test User'\n  \n  - Test User\n  +   Test User  \n  ? ++         ++",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x71cc069770e0>\nuser_data = {'name': '  Test User  ', 'email': 'playwright-e923408e-e1bf-46a3-9513-57aa0fe7380c@test.pl', 'password': '***'}\n\n    def test_create_user_trims_name_whitespace(api_client, user_data):\n        \"\"\"\n        Verify that the API removes leading and trailing whitespace\n        from the name.\n    \n        The test sends a name surrounded by spaces and verifies that\n        the API returns HTTP 201 with the trimmed name.\n        \"\"\"\n    \n        user_data[\"name\"] = \"  Test User  \"\n    \n        response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n        assert response.status_code == 201\n>       assert response.json()[\"name\"] == \"Test User\"\nE       AssertionError: assert '  Test User  ' == 'Test User'\nE         \nE         - Test User\nE         +   Test User  \nE         ? ++         ++\n\ntests/api/test_users_api.py:398: AssertionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 381,
+        "source": "def test_create_user_trims_name_whitespace(api_client, user_data):\n    \"\"\"\n    Verify that the API removes leading and trailing whitespace\n    from the name.\n\n    The test sends a name surrounded by spaces and verifies that\n    the API returns HTTP 201 with the trimmed name.\n    \"\"\"\n\n    user_data[\"name\"] = \"  Test User  \"\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n    assert response.json()[\"name\"] == \"Test User\""
+      },
+      "logs": [
+        "2026-10-23 10:34:14,475 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-23 10:34:14,497 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-23 10:34:14,500 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-23 10:34:14,503 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user_trims_name_whitespace",
+        "2026-10-23 10:34:14,504 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-23 10:34:14,507 | INFO | conftest | Generated test user data for email: playwright-e923408e-e1bf-46a3-9513-57aa0fe7380c@test.pl",
+        "2026-10-23 10:34:14,508 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-23 10:34:14,697 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-23 10:34:14,769 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user_trims_name_whitespace",
+        "2026-10-23 10:34:14,774 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user_trims_name_whitespace",
+        "2026-10-23 10:34:14,778 | INFO | conftest | Deleted 1 test users after test session"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

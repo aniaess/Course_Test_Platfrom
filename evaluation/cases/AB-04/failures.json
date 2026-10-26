@@ -1,0 +1,62 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length[chromium-1234567-Password must be at least 8 characters long.]",
+      "type": "ui",
+      "status": "failed",
+      "time": 18.955,
+      "test_cases": [
+        {
+          "id": "REG-UI-06",
+          "title": "Password too short",
+          "test_data": "password = \"1234567\" (7 characters)",
+          "expected_result": "Message \"Password must be at least 8 characters long.\""
+        },
+        {
+          "id": "REG-UI-11",
+          "title": "Password too long",
+          "test_data": "password = 129 characters",
+          "expected_result": "Message \"Password must be at most 128 characters long.\""
+        }
+      ],
+      "message": "AssertionError: Locator expected to have text 'Password must be at least 8 characters long.'\nActual value: Something went wrong. Please try again later. \nCall log:\n  - Expect \"to_have_text\" locator(\"#register-message\") with timeout 5000ms\n  - waiting for locator(\"#register-message\")\n    14 × locator resolved to <p role=\"status\" id=\"register-message\" class=\"error-message\">Something went wrong. Please try again later.</p>\n       - unexpected value \"Something went wrong. Please try again later.\"\n\nAria snapshot:\n- status: Something went wrong. Please try again later.",
+      "traceback": "register_page = <tests.ui.pages.register_page.RegisterPage object at 0x7f5800331d30>\npassword = '***'\nexpected_message = 'Password must be at least 8 characters long.'\n\n    @pytest.mark.parametrize(\n        \"password, expected_message\",\n        [\n            (\"1234567\", Messages.PASSWORD_TOO_SHORT),    # 7 characters - below minimum\n            (\"A\" * 129, Messages.PASSWORD_TOO_LONG),     # 129 characters - above maximum\n        ]\n    )\n    def test_user_cannot_register_with_invalid_password_length(\n        register_page,\n        password,\n        expected_message\n    ):\n        register_page.open()\n    \n        register_page.register_user(\n            name=\"Test User\",\n            email=\"test@test.pl\",\n            password=***,\n        )\n    \n>       expect(register_page.get_message()).to_have_text(expected_message)\nE       AssertionError: Locator expected to have text 'Password must be at least 8 characters long.'\nE       Actual value: Something went wrong. Please try again later. \nE       Call log:\nE         - Expect \"to_have_text\" locator(\"#register-message\") with timeout 5000ms\nE         - waiting for locator(\"#register-message\")\nE           14 × locator resolved to <p role=\"status\" id=\"register-message\" class=\"error-message\">Something went wrong. Please try again later.</p>\nE              - unexpected value \"Something went wrong. Please try again later.\"\nE       \nE       Aria snapshot:\nE       - status: Something went wrong. Please try again later.\n\ntests/ui/test_register.py:162: AssertionError",
+      "test_code": {
+        "file": "tests/ui/test_register.py",
+        "line": 142,
+        "source": "@pytest.mark.parametrize(\n    \"password, expected_message\",\n    [\n        (\"1234567\", Messages.PASSWORD_TOO_SHORT),    # 7 characters - below minimum\n        (\"A\" * 129, Messages.PASSWORD_TOO_LONG),     # 129 characters - above maximum\n    ]\n)\ndef test_user_cannot_register_with_invalid_password_length(\n    register_page,\n    password,\n    expected_message\n):\n    register_page.open()\n\n    register_page.register_user(\n        name=\"Test User\",\n        email=\"test@test.pl\",\n        password=password,\n    )\n\n    expect(register_page.get_message()).to_have_text(expected_message)"
+      },
+      "logs": [
+        "2026-10-23 11:54:19,501 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-23 11:54:19,573 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-23 11:54:19,640 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-23 11:54:30,197 | INFO | conftest | START TEST: tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length[chromium-1234567-Password must be at least 8 characters long.]",
+        "2026-10-23 11:54:31,199 | INFO | conftest | Creating RegisterPage",
+        "2026-10-23 11:54:31,206 | INFO | tests.ui.pages.base_page | Opening page: http://api:8000/register",
+        "2026-10-23 11:54:31,846 | INFO | tests.ui.pages.base_page | Registering user with email: test@test.pl",
+        "2026-10-23 11:54:32,735 | INFO | tests.ui.pages.base_page | Registration form submitted",
+        "2026-10-23 11:54:32,737 | INFO | tests.ui.pages.base_page | Getting registration message",
+        "2026-10-23 11:54:38,415 | ERROR | conftest | TEST FAILED: tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length[chromium-1234567-Password must be at least 8 characters long.]",
+        "2026-10-23 11:54:38,418 | INFO | conftest | END TEST: tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length[chromium-1234567-Password must be at least 8 characters long.]"
+      ],
+      "artifacts": {
+        "screenshots": [
+          "test-results/playwright/tests-ui-test-register-py-test-user-cannot-register-with-invalid-password-length-chromium-1234567-password-must-be-at-least-8-characters-long/test-failed-1.png"
+        ],
+        "traces": [
+          "test-results/playwright/tests-ui-test-register-py-test-user-cannot-register-with-invalid-password-length-chromium-1234567-password-must-be-at-least-8-characters-long/trace.zip"
+        ]
+      }
+    }
+  ]
+}

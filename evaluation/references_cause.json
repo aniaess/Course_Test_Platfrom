@@ -1,0 +1,338 @@
+{
+  "description": "Reference diagnoses for evaluating the failure analysis agent (scripts/failure_analyzer.py). Each case is one deliberately injected failure with a known cause. Cases are run one at a time: apply the change from 'injection', execute 'run', collect failures.json, run the analyzer and compare its diagnosis with 'actual_category' and 'actual_root_cause'.",
+  "version": 1,
+  "scoring": {
+    "category": "The category is correct when the model's failure_category equals actual_category or is listed in acceptable_categories.",
+    "root_cause": "The root cause is correct when the model's possible_root_cause describes the same mechanism as actual_root_cause (judged manually or by a judge model).",
+    "evidence": "key_evidence lists the signals from failures.json that the diagnosis should refer to."
+  },
+  "notes": [
+    "The Docker image copies the code (COPY . .), so after a change in app/, frontend/ or tests/ run 'docker compose build'.",
+    "test_id has the same format as in failures.json, including pytest parameters.",
+    "Code changes are reverted with 'git checkout -- <file>', environment changes according to 'restore'.",
+    "Since 2026-10-26 the collector writes run.tests: all tests of the run in execution order with their status. Cases collected before that (AB-01..AB-04, TB-01..TB-03, ENV-01..ENV-03, FL-01, FL-02) do not have this field; each of them has a single test in the run, so it would add nothing. FL-03 was collected again with it."
+  ],
+  "cases": [
+    {
+      "case_id": "AB-01",
+      "test_id": "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+      "injection": {
+        "type": "code",
+        "files": ["app/main.py"],
+        "steps": ["Change 'password_hasher = PasswordHasher()' to 'password_hasher = PasswordHasher(type=Type.I)' and add the import 'from argon2 import PasswordHasher, Type'."],
+        "restore": ["git checkout -- app/main.py"]
+      },
+      "run": "pytest \"tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash\"",
+      "actual_category": "application_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "The API hashes passwords with Argon2i instead of Argon2id, because PasswordHasher in app/main.py is configured with type=Type.I.",
+      "key_evidence": [
+        "The stored hash starts with '$argon2i$v=19$...'",
+        "Test case REG-DB-06 requires the '$argon2id$' prefix"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-23: failures.json contains the hash '$argon2i$v=19$...' and 'Response status: 201'."
+    },
+    {
+      "case_id": "AB-02",
+      "test_id": "tests/api/test_users_api.py::test_create_user_trims_name_whitespace",
+      "injection": {
+        "type": "code",
+        "files": ["app/main.py"],
+        "steps": ["In the User model remove 'strip_whitespace=True' from the StringConstraints of the name field."],
+        "restore": ["git checkout -- app/main.py"]
+      },
+      "run": "pytest \"tests/api/test_users_api.py::test_create_user_trims_name_whitespace\"",
+      "actual_category": "application_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "The API does not strip leading and trailing spaces from the name, because the name field validation in the User model lacks strip_whitespace=True.",
+      "key_evidence": [
+        "assert '  Test User  ' == 'Test User'",
+        "Test case REG-API-10 expects the name 'Test User' in the response"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-23: failures.json contains assert '  Test User  ' == 'Test User' and 'Response status: 201'."
+    },
+    {
+      "case_id": "AB-03",
+      "test_id": "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+      "injection": {
+        "type": "code",
+        "files": ["app/main.py"],
+        "steps": ["In the UniqueViolation handler in create_user change 'status_code=409' to 'status_code=400'."],
+        "restore": ["git checkout -- app/main.py"]
+      },
+      "run": "pytest \"tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409\"",
+      "actual_category": "application_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "The POST /users endpoint returns HTTP 400 instead of 409 for an email that is already taken, because the UniqueViolation handler sets the wrong status code.",
+      "key_evidence": [
+        "assert 400 == 409",
+        "The first request returned 201, the second one with the same email returned 400",
+        "Test case REG-API-02 expects HTTP 409"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-23: failures.json contains assert 400 == 409, and the logs show 201 for the first request and 400 for the second."
+    },
+    {
+      "case_id": "AB-04",
+      "test_id": "tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length[chromium-1234567-Password must be at least 8 characters long.]",
+      "injection": {
+        "type": "code",
+        "files": ["frontend/app.js"],
+        "steps": ["Change the condition 'if (password.length < 8)' to 'if (password.length < 7)'."],
+        "restore": ["git checkout -- frontend/app.js"]
+      },
+      "run": "pytest \"tests/ui/test_register.py::test_user_cannot_register_with_invalid_password_length\"",
+      "actual_category": "application_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "The frontend validation (frontend/app.js) accepts a 7-character password, because the minimum length is set to 7 instead of 8. The form sends the request, the API rejects it with 422 and the page shows a generic server error message.",
+      "key_evidence": [
+        "Expected 'Password must be at least 8 characters long.'",
+        "Received 'Something went wrong. Please try again later.'",
+        "Test case REG-UI-06"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-23: the test for a 129-character password passes, only the lower boundary fails. failures.json contains the message 'Something went wrong. Please try again later.' instead of 'Password must be at least 8 characters long.'. Collector limitations: test_cases also contains REG-UI-11 (matching by test name without parameters), the password in the traceback is masked as '***', and the 422 response from the API is not in the data."
+    },
+    {
+      "case_id": "TB-01",
+      "test_id": "tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]",
+      "injection": {
+        "type": "code",
+        "files": ["tests/ui/test_register.py"],
+        "steps": ["Change the expected title 'Login - AI Academy' to the old name 'Login - Course Platform'."],
+        "restore": ["git checkout -- tests/ui/test_register.py"]
+      },
+      "run": "pytest \"tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration\"",
+      "actual_category": "test_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "The test expects the outdated page title 'Login - Course Platform'. After the rebrand to AI Academy the login page correctly has the title 'Login - AI Academy', and the assertion in the test was not updated.",
+      "key_evidence": [
+        "Expected 'Login - Course Platform'",
+        "Received 'Login - AI Academy'",
+        "Test case REG-UI-12 only requires the login page to open"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-23: failures.json contains the expected title 'Login - Course Platform' and the actual 'Login - AI Academy', and the page snapshot shows the open login page. Password masking breaks the code line in the traceback (password=***\"password\"]), the correct code is in test_code."
+    },
+    {
+      "case_id": "TB-02",
+      "test_id": "tests/ui/test_register.py::test_user_cannot_register_with_existing_email[chromium]",
+      "injection": {
+        "type": "code",
+        "files": ["tests/ui/pages/register_page.py"],
+        "steps": ["Change the locator 'self.register_message = page.locator(\"#register-message\")' to 'page.locator(\"#register-msg\")'."],
+        "restore": ["git checkout -- tests/ui/pages/register_page.py"]
+      },
+      "run": "pytest \"tests/ui/test_register.py::test_user_cannot_register_with_existing_email\"",
+      "actual_category": "test_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "The RegisterPage page object uses the wrong locator '#register-msg', while the element on the page has the id 'register-message'. The locator finds no element, so expect ends with a timeout.",
+      "key_evidence": [
+        "Locator: locator('#register-msg')",
+        "element(s) not found / waiting for locator('#register-msg')",
+        "The POST /users request in the logs returned 201 for the user prepared through the API"
+      ],
+      "verified": true,
+      "verification_notes": "The timeout may lead the model towards flaky_test. The deciding signal is 'element(s) not found' instead of a wrong value. Verified manually on 2026-10-23: failures.json contains 'element(s) not found' for locator('#register-msg'), and the page snapshot shows 'status: User with this email already exists'. The long snapshot cuts off the beginning of the traceback (60-line limit)."
+    },
+    {
+      "case_id": "TB-03",
+      "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+      "injection": {
+        "type": "code",
+        "files": ["tests/api/test_users_api.py"],
+        "steps": ["In the parameters of test_create_user_with_name_length_boundary change '(\"AB\", 201)' to '(\"AB\", 422)'."],
+        "restore": ["git checkout -- tests/api/test_users_api.py"]
+      },
+      "run": "pytest \"tests/api/test_users_api.py::test_create_user_with_name_length_boundary\"",
+      "actual_category": "test_bug",
+      "acceptable_categories": [],
+      "actual_root_cause": "Wrong test data: the test expects 422 for a 2-character name, but 2 characters is the allowed minimum (REG-API-05: 2 characters -> 201). The API correctly returns 201.",
+      "key_evidence": [
+        "assert 201 == 422",
+        "Test case REG-API-05: '1 / 2 / 100 / 101 characters' -> '422 / 201 / 201 / 422'",
+        "Comment in the test code: '2 characters - minimum'"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-26: 3 passed, 1 failed ([AB-422]). failures.json contains assert 201 == 422, 'Response status: 201', REG-API-05 as the only test case, and test_code shows ('AB', 422) with the comment '2 characters - minimum' and a docstring stating the 2-character minimum. Masking is inconsistent: in the traceback the password is '***', while test_code shows 'secret123' (test_code is not masked)."
+    },
+    {
+      "case_id": "ENV-01",
+      "test_id": "tests/api/test_users_api.py::test_create_user",
+      "injection": {
+        "type": "environment",
+        "files": [],
+        "steps": ["Run the tests with a wrong API address: 'docker compose run --rm -e BASE_URL=http://api:8001 tests pytest \"tests/api/test_users_api.py::test_create_user\"'."],
+        "restore": ["Nothing to revert, the change only affects a single run."]
+      },
+      "run": "docker compose run --rm -e BASE_URL=http://api:8001 tests pytest \"tests/api/test_users_api.py::test_create_user\"",
+      "actual_category": "environment_issue",
+      "acceptable_categories": [],
+      "actual_root_cause": "Wrong configuration: BASE_URL points to port 8001, where the API is not listening (the API runs on 8000), so the connection is refused.",
+      "key_evidence": [
+        "requests.exceptions.ConnectionError",
+        "HTTPConnectionPool(host='api', port=8001)",
+        "Connection refused",
+        "Creating API client with base URL: http://api:8001"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-26: failures.json contains a ConnectionError to api:8001 with 'Connection refused' and the log 'Creating API client with base URL: http://api:8001'. The logs show a successful PostgreSQL connection, so the database is ruled out. The traceback (677 lines) is cut to the last 60, leaving only requests/adapters.py internals, while the test frame and api_client.post are cut off."
+    },
+    {
+      "case_id": "ENV-02",
+      "test_id": "tests/db/test_users_db.py::test_users_table_has_expected_columns",
+      "injection": {
+        "type": "environment",
+        "files": [],
+        "steps": ["Run the tests with a wrong database password: 'docker compose run --rm -e DB_PASSWORD=wrong-password tests pytest \"tests/db/test_users_db.py::test_users_table_has_expected_columns\"'."],
+        "restore": ["Nothing to revert, the change only affects a single run."]
+      },
+      "run": "docker compose run --rm -e DB_PASSWORD=wrong-password tests pytest \"tests/db/test_users_db.py::test_users_table_has_expected_columns\"",
+      "actual_category": "environment_issue",
+      "acceptable_categories": [],
+      "actual_root_cause": "The tests container has the wrong PostgreSQL password (DB_PASSWORD), so connecting to the database in the clean_test_users fixture fails with an authentication error before the test starts.",
+      "key_evidence": [
+        "psycopg2.OperationalError",
+        "password authentication failed for user \"postgres\"",
+        "status 'error' (failure in fixture setup, not in an assertion)"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-26: status 'error' (failed on setup), psycopg2.OperationalError with 'password authentication failed for user \"postgres\"', the traceback points to 'connection = get_connection()' in tests/conftest.py:79 (fixture clean_test_users). The password 'wrong-password' IS masked (password=*** in the dsn), because PASSWORD_PATTERN matches any value after 'password='. The first collection had '???' and a Windows path caused by a stale __pycache__ copied into the image. Collected again after adding .dockerignore. The fixture name 'def clean_test_users' is in the cut-off traceback lines, but line 79 and its code are visible."
+    },
+    {
+      "case_id": "ENV-03",
+      "test_id": "tests/db/test_users_db.py::test_created_user_is_persisted_in_database",
+      "injection": {
+        "type": "environment",
+        "files": [],
+        "steps": ["Drop the users table: 'docker compose exec db psql -U postgres -d course_platform -c \"DROP TABLE users\"'."],
+        "restore": ["docker compose exec -T db psql -U postgres -d course_platform < db/init.sql (bash) or 'Get-Content -Raw db/init.sql | docker compose exec -T db psql -U postgres -d course_platform' (PowerShell, which has no '<' redirection)"]
+      },
+      "run": "pytest \"tests/db/test_users_db.py::test_created_user_is_persisted_in_database\"",
+      "actual_category": "environment_issue",
+      "acceptable_categories": [],
+      "actual_root_cause": "The database is not initialized: the users table does not exist (db/init.sql was not executed or the table was dropped), so already the DELETE in the clean_test_users fixture fails.",
+      "key_evidence": [
+        "psycopg2.errors.UndefinedTable",
+        "relation \"users\" does not exist",
+        "Failure in the clean_test_users fixture (DELETE FROM users ...)"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-26: status 'error' (failed on setup), psycopg2.errors.UndefinedTable 'relation \"users\" does not exist' for 'DELETE FROM users WHERE email LIKE ...'. The traceback shows the whole chain: clean_test_users (tests/conftest.py:81) -> delete_test_users -> cursor.execute (tests/conftest.py:55). The logs show 'PostgreSQL database connection established', so the connection itself is ruled out."
+    },
+    {
+      "case_id": "FL-01",
+      "test_id": "tests/ui/test_register.py::test_user_can_register_successfully[chromium]",
+      "injection": {
+        "type": "code",
+        "files": ["tests/ui/test_register.py"],
+        "steps": ["Replace 'expect(register_page.get_message()).to_have_text(Messages.REGISTRATION_SUCCESS)' with 'assert register_page.get_message().text_content() == Messages.REGISTRATION_SUCCESS'."],
+        "restore": ["git checkout -- tests/ui/test_register.py"]
+      },
+      "run": "pytest \"tests/ui/test_register.py::test_user_can_register_successfully\"",
+      "actual_category": "flaky_test",
+      "acceptable_categories": ["test_bug"],
+      "actual_root_cause": "Race condition in the test: the message is read with text_content() right after the click, without the auto-waiting of expect, before the fetch to POST /users finishes and the frontend writes the message.",
+      "key_evidence": [
+        "assert '' == 'Registration successful!'",
+        "The test code uses text_content() instead of expect(...).to_have_text(...)"
+      ],
+      "verified": true,
+      "verification_notes": "test_bug is also correct, because the cause is in the test code. More important is that the model points to the missing wait (race), not to an application bug. Verified manually on 2026-10-26: the test ran 10 times in a loop in one container (separate pytest processes) and failed 10/10, so in this environment the failure is deterministic, not intermittent. Why: the message is read 7 ms after the form is submitted (logs: 'Registration form submitted' 11:21:42,363, 'Getting registration message' 11:21:42,370), while the POST /users response takes much longer because of Argon2 hashing, so the race is always lost. failures.json contains assert '' == 'Registration successful!', the text_content() line in the traceback and 'Deleted 1 test users after test session' (the user was created). The screenshot shows 'Registration successful!' a moment after the assertion, but the analyzer only gets its path. Password masking breaks the code line in the traceback (password=***\"password\"]), as in TB-01."
+    },
+    {
+      "case_id": "FL-02",
+      "test_id": "tests/ui/test_register.py::test_user_cannot_register_with_existing_email[chromium]",
+      "injection": {
+        "type": "code",
+        "files": ["tests/ui/test_register.py"],
+        "steps": ["In the first expect change 'to_have_text(Messages.EMAIL_ALREADY_EXISTS)' to 'to_have_text(Messages.EMAIL_ALREADY_EXISTS, timeout=100)'."],
+        "restore": ["git checkout -- tests/ui/test_register.py"]
+      },
+      "run": "pytest \"tests/ui/test_register.py::test_user_cannot_register_with_existing_email\"",
+      "actual_category": "flaky_test",
+      "acceptable_categories": ["test_bug"],
+      "actual_root_cause": "The timeout for the 'email already exists' message is too short (100 ms). The API response (including Argon2 hashing) sometimes takes longer, so the test fails depending on the machine speed.",
+      "key_evidence": [
+        "Expect \"to_have_text\" locator(\"#register-message\") with timeout 100ms",
+        "Actual value is empty (the message has not appeared yet)",
+        "In the test code: timeout=100",
+        "POST /users during test data setup took about 585 ms (Response status: 201), so the API responds slower than 100 ms"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-26: the test ran 10 times in a loop in one container (separate pytest processes) and failed 10/10, so in this environment the failure is deterministic, not intermittent. Why: POST /users takes about 585 ms (logs: 'POST /users' 11:49:19,340, 'Response status: 201' 11:49:19,925), mostly Argon2 hashing, and the form request is just as slow, so a 100 ms timeout is always too short. Because it fails every time, test_bug is also accepted. key_evidence was corrected after the run: Playwright does not print 'Timeout 100ms exceeded' or 'unexpected value \"\"' here, but 'with timeout 100ms' and an empty 'Actual value:'. The aria snapshot does not contain the message, which may push the model towards application_bug or a wrong locator (as in TB-02); the deciding signals are 'with timeout 100ms', timeout=100 in the code and no 'element(s) not found'. Collector weakness: the password 'anotherpassword123' is not masked in the aria snapshot (textbox \"Password\" ... text: ...), because PASSWORD_PATTERN only matches 'password=' forms."
+    },
+    {
+      "case_id": "FL-03",
+      "test_id": "tests/db/test_users_db.py::test_user_email_must_be_unique",
+      "injection": {
+        "type": "code",
+        "files": ["tests/api/test_users_api.py", "tests/db/test_users_db.py"],
+        "steps": [
+          "In test_create_user, before sending the request, add: user_data[\"email\"] = \"shared-user@test.pl\".",
+          "In test_user_email_must_be_unique use the fixed email \"shared-user@test.pl\" in both INSERTs instead of user_data[\"email\"]."
+        ],
+        "restore": ["git checkout -- tests/api/test_users_api.py tests/db/test_users_db.py"]
+      },
+      "run": "pytest \"tests/api/test_users_api.py::test_create_user\" \"tests/db/test_users_db.py::test_user_email_must_be_unique\"",
+      "actual_category": "flaky_test",
+      "acceptable_categories": ["test_bug"],
+      "actual_root_cause": "Test order dependency: test_create_user leaves a user with the same fixed email 'shared-user@test.pl' in the database, so the first INSERT in test_user_email_must_be_unique (outside pytest.raises) violates the UNIQUE constraint. Run alone, the test passes.",
+      "key_evidence": [
+        "psycopg2.errors.UniqueViolation",
+        "Key (email)=(shared-user@test.pl) already exists",
+        "The exception is raised at the first INSERT, not inside the pytest.raises block",
+        "run.tests: test_create_user ran (passed) right before the failing test"
+      ],
+      "verified": true,
+      "verification_notes": "test_bug is also correct (a fixed email instead of unique data from the user_data fixture). The model should point to data left behind by another test. Verified manually on 2026-10-26: run alone, test_user_email_must_be_unique passes; run after test_create_user it fails with UniqueViolation 'Key (email)=(shared-user@test.pl) already exists.' at the first INSERT (tests/db/test_users_db.py:67). The logs show that the user_data fixture generated a unique email that the test did not use. The first collection had no information about the passed test_create_user, so the collector got run.tests (all tests in execution order) and the case was collected again: run.tests shows test_create_user (passed) right before the failing test. The code and logs of passed tests are still not included, so the fixed email in test_create_user is not visible."
+    },
+    {
+      "case_id": "IE-01",
+      "test_id": "tests/api/test_users_api.py::test_create_user",
+      "injection": {
+        "type": "environment",
+        "files": [],
+        "steps": [
+          "Restart only the API container with a wrong database password: 'DB_PASSWORD=wrong-password docker compose up -d --force-recreate --no-deps api'. The /health endpoint does not connect to the database, so the API is healthy.",
+          "Run the test with the correct password in the tests container (without overriding DB_PASSWORD)."
+        ],
+        "restore": ["docker compose up -d --force-recreate --no-deps api (with the correct DB_PASSWORD)"]
+      },
+      "run": "docker compose run --rm --no-deps tests pytest \"tests/api/test_users_api.py::test_create_user\"",
+      "actual_category": "insufficient_evidence",
+      "acceptable_categories": [],
+      "actual_root_cause": "Actual cause: the API container has the wrong DB_PASSWORD and cannot connect to the database, so POST /users ends with HTTP 500. The API server logs are not in failures.json, and the test only sees status 500. The available data cannot distinguish an application bug from an environment issue.",
+      "key_evidence": [
+        "assert 500 == 201",
+        "Response status: 500",
+        "No API server logs in failures.json"
+      ],
+      "verified": true,
+      "verification_notes": "Checks that the model does not guess. application_bug with high confidence is wrong. This case also shows that the collector does not gather the API container logs. Verified manually on 2026-10-26: the API was healthy with the wrong DB_PASSWORD (/health does not use the database). failures.json contains assert 500 == 201 and 'Response status: 500' without a response body; 'password authentication failed for user \"postgres\"' appears only in 'docker compose logs api'. Trap: the test logs show 'PostgreSQL database connection established', but that is the tests container connecting with the correct password; the model may wrongly conclude the database is fine and choose application_bug. If the collector starts gathering API container logs, the expected category has to change to environment_issue."
+    },
+    {
+      "case_id": "IE-02",
+      "test_id": "tests/ui/test_register.py::test_user_can_register_successfully[chromium]",
+      "injection": {
+        "type": "code",
+        "files": ["tests/conftest.py"],
+        "steps": ["In the register_page fixture add 'page.close()' before 'return RegisterPage(page)'."],
+        "restore": ["git checkout -- tests/conftest.py"]
+      },
+      "run": "pytest \"tests/ui/test_register.py::test_user_can_register_successfully\"",
+      "actual_category": "insufficient_evidence",
+      "acceptable_categories": [],
+      "actual_root_cause": "Actual cause: the register_page fixture closes the page before the test. failures.json only shows a TargetClosedError at page.goto, and the fixture code is not included. The same error can come from a browser crash (e.g. out of memory in the container), a bug in a fixture or a Playwright problem, so the data is not enough to decide.",
+      "key_evidence": [
+        "playwright._impl._errors.TargetClosedError",
+        "Target page, context or browser has been closed",
+        "Failure at register_page.open() -> page.goto, before any interaction with the form"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-26: the traceback does NOT show the page.close() line or any conftest frame; it goes from register_page.open() (tests/ui/test_register.py:25) through register_page.py:23 and base_page.py:18 to self.page.goto(url), ending with TargetClosedError. test_code contains only the test, there is no screenshot (the page was already closed), only the trace.zip path. The only hint is the log 'Creating RegisterPage' right before the failure, which may point the model to the fixture but does not prove it, so insufficient_evidence stays the expected category."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0,
+    "tests": [
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user",
+        "status": "passed"
+      },
+      {
+        "test_id": "tests/db/test_users_db.py::test_user_email_must_be_unique",
+        "status": "failed"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "test_id": "tests/db/test_users_db.py::test_user_email_must_be_unique",
+      "type": "db",
+      "status": "failed",
+      "time": 0.043,
+      "test_cases": [
+        {
+          "id": "REG-DB-02",
+          "title": "Email is unique",
+          "test_data": "Insert of a duplicate email",
+          "expected_result": "Database rejects the insert"
+        }
+      ],
+      "message": "psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint \"users_email_key\"\nDETAIL:  Key (email)=(shared-user@test.pl) already exists.",
+      "traceback": "db_connection = <connection object at 0x7bf303919940; dsn: 'user=postgres password=*** dbname=course_platform host=db port=5432', closed: 0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-d1092b50-4862-489e-bcfd-6adf2a780683@test.pl', 'password': '***'}\n\n    def test_user_email_must_be_unique(\n        db_connection,\n        user_data\n    ):\n        \"\"\"\n        Verify that the database does not allow two users with the same\n        email address.\n    \n        The test inserts a user into the database and then attempts to\n        insert another user using the same email address.\n    \n        The test verifies that PostgreSQL raises a UniqueViolation error.\n        \"\"\"\n    \n        cursor = db_connection.cursor()\n    \n>       cursor.execute(\n            \"\"\"\n            INSERT INTO users (name, email, password)\n            VALUES (%s, %s, %s)\n            \"\"\",\n            (\n                user_data[\"name\"],\n                \"shared-user@test.pl\",\n                user_data[\"password\"]\n            )\n        )\nE       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint \"users_email_key\"\nE       DETAIL:  Key (email)=(shared-user@test.pl) already exists.\n\ntests/db/test_users_db.py:67: UniqueViolation",
+      "test_code": {
+        "file": "tests/db/test_users_db.py",
+        "line": 51,
+        "source": "def test_user_email_must_be_unique(\n    db_connection,\n    user_data\n):\n    \"\"\"\n    Verify that the database does not allow two users with the same\n    email address.\n\n    The test inserts a user into the database and then attempts to\n    insert another user using the same email address.\n\n    The test verifies that PostgreSQL raises a UniqueViolation error.\n    \"\"\"\n\n    cursor = db_connection.cursor()\n\n    cursor.execute(\n        \"\"\"\n        INSERT INTO users (name, email, password)\n        VALUES (%s, %s, %s)\n        \"\"\",\n        (\n            user_data[\"name\"],\n            \"shared-user@test.pl\",\n            user_data[\"password\"]\n        )\n    )\n\n    db_connection.commit()\n\n    with pytest.raises(UniqueViolation):\n        cursor.execute(\n            \"\"\"\n            INSERT INTO users (name, email, password)\n            VALUES (%s, %s, %s)\n            \"\"\",\n            (\n                \"Another User\",\n                \"shared-user@test.pl\",\n                \"anotherpassword123\"\n            )\n        )\n\n    db_connection.rollback()"
+      },
+      "logs": [
+        "2026-10-26 12:30:38,744 | INFO | conftest | START TEST: tests/db/test_users_db.py::test_user_email_must_be_unique",
+        "2026-10-26 12:30:38,745 | INFO | conftest | Connecting to database",
+        "2026-10-26 12:30:38,746 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 12:30:38,762 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 12:30:38,764 | INFO | conftest | Database connection established",
+        "2026-10-26 12:30:38,765 | INFO | conftest | Generated test user data for email: playwright-d1092b50-4862-489e-bcfd-6adf2a780683@test.pl",
+        "2026-10-26 12:30:38,823 | INFO | conftest | Closing database connection",
+        "2026-10-26 12:30:38,825 | INFO | conftest | Database connection closed",
+        "2026-10-26 12:30:38,827 | ERROR | conftest | TEST FAILED: tests/db/test_users_db.py::test_user_email_must_be_unique",
+        "2026-10-26 12:30:38,831 | INFO | conftest | END TEST: tests/db/test_users_db.py::test_user_email_must_be_unique",
+        "2026-10-26 12:30:38,836 | INFO | conftest | Deleted 1 test users after test session"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

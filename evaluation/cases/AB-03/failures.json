@@ -1,0 +1,54 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+      "type": "api",
+      "status": "failed",
+      "time": 0.525,
+      "test_cases": [
+        {
+          "id": "REG-API-02",
+          "title": "Duplicate email",
+          "test_data": "Email of an already registered user",
+          "expected_result": "HTTP 409"
+        }
+      ],
+      "message": "assert 400 == 409\n +  where 400 = <Response [400]>.status_code",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x71308b9670e0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-1ce2fa84-7185-4e3d-b7c4-7b6ef1a7e0af@test.pl', 'password': '***'}\n\n    def test_create_user_with_duplicate_email_returns_409(\n        api_client,\n        user_data\n    ):\n        \"\"\"\n        Verify that the API rejects a user registration when the email\n        address is already registered.\n    \n        The test first creates a user with valid data and then attempts\n        to create another user using the same email address.\n    \n        The test verifies that the API returns HTTP 409 Conflict and\n        provides the expected duplicate-email error message.\n        \"\"\"\n    \n        first_response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n        assert first_response.status_code == 201\n    \n        second_response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n>       assert second_response.status_code == 409\nE       assert 400 == 409\nE        +  where 400 = <Response [400]>.status_code\n\ntests/api/test_users_api.py:58: AssertionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 31,
+        "source": "def test_create_user_with_duplicate_email_returns_409(\n    api_client,\n    user_data\n):\n    \"\"\"\n    Verify that the API rejects a user registration when the email\n    address is already registered.\n\n    The test first creates a user with valid data and then attempts\n    to create another user using the same email address.\n\n    The test verifies that the API returns HTTP 409 Conflict and\n    provides the expected duplicate-email error message.\n    \"\"\"\n\n    first_response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert first_response.status_code == 201\n\n    second_response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert second_response.status_code == 409\n\n    response_data = second_response.json()\n\n    assert response_data[\"detail\"] == Messages.EMAIL_ALREADY_EXISTS"
+      },
+      "logs": [
+        "2026-10-23 10:41:09,897 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-23 10:41:09,918 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-23 10:41:09,921 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-23 10:41:09,925 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "2026-10-23 10:41:09,926 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-23 10:41:09,929 | INFO | conftest | Generated test user data for email: playwright-1ce2fa84-7185-4e3d-b7c4-7b6ef1a7e0af@test.pl",
+        "2026-10-23 10:41:09,931 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-23 10:41:10,244 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-23 10:41:10,246 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-23 10:41:10,408 | INFO | tests.api.client.api_client | Response status: 400",
+        "2026-10-23 10:41:10,458 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "2026-10-23 10:41:10,461 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "2026-10-23 10:41:10,466 | INFO | conftest | Deleted 1 test users after test session"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

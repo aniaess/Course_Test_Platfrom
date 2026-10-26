@@ -1,0 +1,47 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 4,
+    "passed": 3,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0
+  },
+  "failures": [
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+      "type": "api",
+      "status": "failed",
+      "time": 0.225,
+      "test_cases": [
+        {
+          "id": "REG-API-05",
+          "title": "Name length boundaries",
+          "test_data": "1 / 2 / 100 / 101 characters",
+          "expected_result": "422 / 201 / 201 / 422"
+        }
+      ],
+      "message": "assert 201 == 422\n +  where 201 = <Response [201]>.status_code",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x77817790dd10>\nname = 'AB', expected_status_code = 422\n\n    @pytest.mark.parametrize(\n        \"name, expected_status_code\",\n        [\n            (\"A\", 422),        # 1 character - below minimum\n            (\"AB\", 422),       # 2 characters - minimum\n            (\"A\" * 100, 201),  # 100 characters - maximum\n            (\"A\" * 101, 422),  # 101 characters - above maximum\n        ]\n    )\n    def test_create_user_with_name_length_boundary(\n        api_client,\n        name,\n        expected_status_code\n    ):\n        \"\"\"\n        Verify that the API correctly validates the length of the user's name.\n    \n        The test checks values below, at, and above the allowed name length\n        boundaries. The minimum allowed length is 2 characters and the maximum\n        allowed length is 100 characters.\n    \n        The test verifies that values within the allowed range are accepted\n        with HTTP 201 Created, while values outside the range are rejected\n        with HTTP 422 Unprocessable Entity.\n        \"\"\"\n    \n        user_data = {\n            \"name\": name,\n            \"email\": f\"test-{uuid.uuid4()}@test.pl\",\n            \"password\": \"***\"\n        }\n    \n        response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n>       assert response.status_code == expected_status_code\nE       assert 201 == 422\nE        +  where 201 = <Response [201]>.status_code\n\ntests/api/test_users_api.py:210: AssertionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 173,
+        "source": "@pytest.mark.parametrize(\n    \"name, expected_status_code\",\n    [\n        (\"A\", 422),        # 1 character - below minimum\n        (\"AB\", 422),       # 2 characters - minimum\n        (\"A\" * 100, 201),  # 100 characters - maximum\n        (\"A\" * 101, 422),  # 101 characters - above maximum\n    ]\n)\ndef test_create_user_with_name_length_boundary(\n    api_client,\n    name,\n    expected_status_code\n):\n    \"\"\"\n    Verify that the API correctly validates the length of the user's name.\n\n    The test checks values below, at, and above the allowed name length\n    boundaries. The minimum allowed length is 2 characters and the maximum\n    allowed length is 100 characters.\n\n    The test verifies that values within the allowed range are accepted\n    with HTTP 201 Created, while values outside the range are rejected\n    with HTTP 422 Unprocessable Entity.\n    \"\"\"\n\n    user_data = {\n        \"name\": name,\n        \"email\": f\"test-{uuid.uuid4()}@test.pl\",\n        \"password\": \"secret123\"\n    }\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == expected_status_code\n\n    if expected_status_code == 422:\n        response_data = response.json()\n\n        assert response_data[\"detail\"][0][\"loc\"] == [\n            \"body\",\n            \"name\"\n        ]"
+      },
+      "logs": [
+        "2026-10-26 09:49:29,642 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+        "2026-10-26 09:49:29,643 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 09:49:29,645 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 09:49:29,858 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-26 09:49:29,922 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+        "2026-10-26 09:49:29,925 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}
