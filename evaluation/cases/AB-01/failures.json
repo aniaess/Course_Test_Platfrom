@@ -7,14 +7,20 @@
     "passed": 0,
     "failed": 1,
     "error": 0,
-    "skipped": 0
+    "skipped": 0,
+    "tests": [
+      {
+        "test_id": "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "status": "failed"
+      }
+    ]
   },
   "failures": [
     {
       "test_id": "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
       "type": "db",
       "status": "failed",
-      "time": 0.246,
+      "time": 0.461,
       "test_cases": [
         {
           "id": "REG-DB-06",
@@ -23,31 +29,31 @@
           "expected_result": "Stored value starts with `$argon2id$` and has at most 255 characters"
         }
       ],
-      "message": "AssertionError: assert False\n +  where False = <built-in method startswith of str object at 0x71d38f7697d0>('$argon2id$')\n +    where <built-in method startswith of str object at 0x71d38f7697d0> = '$argon2i$v=19$m=65536,t=3,p=4$y94K8HdVUL31nfLBDpt3ZA$J2RerCffFA9fpZbclIx55lRQzh56aqWtRy4oUCiuXjk'.startswith",
-      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x71d38f767380>\ndb_connection = <connection object at 0x71d38f30eac0; dsn: 'user=postgres password=*** dbname=course_platform host=db port=5432', closed: 0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-baf0490c-6b52-49ad-bd16-dd907b463ca6@test.pl', 'password': '***'}\n\n>   ???\nE   AssertionError: assert False\nE    +  where False = <built-in method startswith of str object at 0x71d38f7697d0>('$argon2id$')\nE    +    where <built-in method startswith of str object at 0x71d38f7697d0> = '$argon2i$v=19$m=65536,t=3,p=4$y94K8HdVUL31nfLBDpt3ZA$J2RerCffFA9fpZbclIx55lRQzh56aqWtRy4oUCiuXjk'.startswith\n\nC:\\Users\\Rolf\\PythonProject\\Playwright\\Courses_Platform_Tests\\tests\\db\\test_users_db.py:258: AssertionError",
+      "message": "AssertionError: assert False\n +  where False = <built-in method startswith of str object at 0x77743713c540>('$argon2id$')\n +    where <built-in method startswith of str object at 0x77743713c540> = '$argon2i$v=19$m=65536,t=3,p=4$BJs77hGKdcmr3C69D2srhQ$rqNOUuCbv7+vgug/k83hmjzVOom/96YHlZGJzOhlJ2k'.startswith",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x77743557f4d0>\ndb_connection = <connection object at 0x77743511e5c0; dsn: 'user=postgres password=*** dbname=course_platform host=db port=5432', closed: 0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-c88dd80b-f410-4527-b5dc-c1bf3a7ba361@test.pl', 'password': '***'}\n\n    def test_password_is_stored_as_argon2id_hash(\n        api_client,\n        db_connection,\n        user_data\n    ):\n        \"\"\"\n        Verify that the user's password is stored as an Argon2id hash.\n    \n        The test creates a user through the API and then reads the stored\n        password value from the database.\n    \n        The test verifies that the stored value uses the Argon2id PHC string\n        format (prefix \"$argon2id$\") and fits in the password column.\n        \"\"\"\n    \n        response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n        assert response.status_code == 201\n    \n        stored_password = ***\n            db_connection,\n            user_data[\"email\"]\n        )\n    \n>       assert stored_password.startswith(\"$argon2id$\")\nE       AssertionError: assert False\nE        +  where False = <built-in method startswith of str object at 0x77743713c540>('$argon2id$')\nE        +    where <built-in method startswith of str object at 0x77743713c540> = '$argon2i$v=19$m=65536,t=3,p=4$BJs77hGKdcmr3C69D2srhQ$rqNOUuCbv7+vgug/k83hmjzVOom/96YHlZGJzOhlJ2k'.startswith\n\ntests/db/test_users_db.py:258: AssertionError",
       "test_code": {
         "file": "tests/db/test_users_db.py",
         "line": 231,
         "source": "def test_password_is_stored_as_argon2id_hash(\n    api_client,\n    db_connection,\n    user_data\n):\n    \"\"\"\n    Verify that the user's password is stored as an Argon2id hash.\n\n    The test creates a user through the API and then reads the stored\n    password value from the database.\n\n    The test verifies that the stored value uses the Argon2id PHC string\n    format (prefix \"$argon2id$\") and fits in the password column.\n    \"\"\"\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n\n    stored_password = get_stored_password(\n        db_connection,\n        user_data[\"email\"]\n    )\n\n    assert stored_password.startswith(\"$argon2id$\")\n    assert len(stored_password) <= 255"
       },
       "logs": [
-        "2026-10-23 10:33:16,421 | INFO | app.database | Connecting to PostgreSQL database",
-        "2026-10-23 10:33:16,445 | INFO | app.database | PostgreSQL database connection established",
-        "2026-10-23 10:33:16,448 | INFO | conftest | Deleted 0 test users before test session",
-        "2026-10-23 10:33:16,452 | INFO | conftest | START TEST: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
-        "2026-10-23 10:33:16,454 | INFO | conftest | Creating API client with base URL: http://api:8000",
-        "2026-10-23 10:33:16,456 | INFO | conftest | Connecting to database",
-        "2026-10-23 10:33:16,457 | INFO | app.database | Connecting to PostgreSQL database",
-        "2026-10-23 10:33:16,470 | INFO | app.database | PostgreSQL database connection established",
-        "2026-10-23 10:33:16,472 | INFO | conftest | Database connection established",
-        "2026-10-23 10:33:16,473 | INFO | conftest | Generated test user data for email: playwright-baf0490c-6b52-49ad-bd16-dd907b463ca6@test.pl",
-        "2026-10-23 10:33:16,475 | INFO | tests.api.client.api_client | POST /users",
-        "2026-10-23 10:33:16,651 | INFO | tests.api.client.api_client | Response status: 201",
-        "2026-10-23 10:33:16,691 | INFO | conftest | Closing database connection",
-        "2026-10-23 10:33:16,692 | INFO | conftest | Database connection closed",
-        "2026-10-23 10:33:16,693 | ERROR | conftest | TEST FAILED: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
-        "2026-10-23 10:33:16,695 | INFO | conftest | END TEST: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
-        "2026-10-23 10:33:16,700 | INFO | conftest | Deleted 1 test users after test session"
+        "2026-10-26 13:12:49,297 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 13:12:49,333 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 13:12:49,354 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-26 13:12:49,359 | INFO | conftest | START TEST: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "2026-10-26 13:12:49,360 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 13:12:49,363 | INFO | conftest | Connecting to database",
+        "2026-10-26 13:12:49,364 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 13:12:49,387 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 13:12:49,389 | INFO | conftest | Database connection established",
+        "2026-10-26 13:12:49,391 | INFO | conftest | Generated test user data for email: playwright-c88dd80b-f410-4527-b5dc-c1bf3a7ba361@test.pl",
+        "2026-10-26 13:12:49,394 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 13:12:49,729 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-26 13:12:49,789 | INFO | conftest | Closing database connection",
+        "2026-10-26 13:12:49,790 | INFO | conftest | Database connection closed",
+        "2026-10-26 13:12:49,795 | ERROR | conftest | TEST FAILED: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "2026-10-26 13:12:49,798 | INFO | conftest | END TEST: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "2026-10-26 13:12:49,804 | INFO | conftest | Deleted 1 test users after test session"
       ],
       "artifacts": {
         "screenshots": [],

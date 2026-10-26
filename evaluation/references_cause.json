@@ -31,7 +31,7 @@
         "Test case REG-DB-06 requires the '$argon2id$' prefix"
       ],
       "verified": true,
-      "verification_notes": "Verified manually on 2026-10-23: failures.json contains the hash '$argon2i$v=19$...' and 'Response status: 201'."
+      "verification_notes": "Verified manually on 2026-10-23: failures.json contains the hash '$argon2i$v=19$...' and 'Response status: 201'. Collected again on 2026-10-26 after adding .dockerignore: the first collection had '???' instead of the assertion line (stale __pycache__ in the image). The new traceback shows 'assert stored_password.startswith(\"$argon2id$\")' at tests/db/test_users_db.py:258 and the file has run.tests. Masking still turns 'stored_password = get_stored_password(' into 'stored_password = ***' in the traceback; test_code has the correct line."
     },
     {
       "case_id": "AB-02",
