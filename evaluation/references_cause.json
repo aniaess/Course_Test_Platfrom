@@ -333,6 +333,31 @@
       ],
       "verified": true,
       "verification_notes": "Verified manually on 2026-10-26: the traceback does NOT show the page.close() line or any conftest frame; it goes from register_page.open() (tests/ui/test_register.py:25) through register_page.py:23 and base_page.py:18 to self.page.goto(url), ending with TargetClosedError. test_code contains only the test, there is no screenshot (the page was already closed), only the trace.zip path. The only hint is the log 'Creating RegisterPage' right before the failure, which may point the model to the fixture but does not prove it, so insufficient_evidence stays the expected category."
+    },
+    {
+      "case_id": "MIX-01",
+      "test_ids": [
+        "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]",
+        "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]"
+      ],
+      "injection": {
+        "type": "code",
+        "files": ["app/main.py", "tests/ui/test_register.py", "tests/api/test_users_api.py"],
+        "steps": ["Apply the injections of AB-01, AB-03, TB-01 and TB-03 at the same time."],
+        "restore": ["git checkout -- app/main.py tests/ui/test_register.py tests/api/test_users_api.py"]
+      },
+      "run": "pytest \"tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash\" \"tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409\" \"tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration\" \"tests/api/test_users_api.py::test_create_user_with_name_length_boundary\"",
+      "expected": {
+        "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash": "AB-01",
+        "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409": "AB-03",
+        "tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]": "TB-01",
+        "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]": "TB-03"
+      },
+      "actual_root_cause": "Four independent failures with different causes; each failure is scored against the case named in 'expected'. The model must not merge them into one shared cause (e.g. 'the API is broken'), especially the two API failures, where AB-03 is an application_bug and TB-03 is a test_bug.",
+      "verified": true,
+      "verification_notes": "Collected on 2026-10-26: 7 tests (4 failed, 3 passed: the other name length parameters). run.tests lists all 7 in execution order. Every failure contains the key evidence of its single case ('$argon2i$v=19' + REG-DB-06, assert 400 == 409 + 'Response status: 400' + REG-API-02, 'Login - Course Platform' vs 'Login - AI Academy' + REG-UI-12, assert 201 == 422 + '2 characters - minimum' + REG-API-05), no '???' in the tracebacks. Verified by Claude on 2026-10-26 at the user's request (full file reviewed): each failure has its own logs without mixing between tests, test_code contains the injected lines, test_cases has exactly one matching case per failure, and the TB-01 aria snapshot shows the open login page. Known collector issue: masking turns 'stored_password = get_stored_password(' into 'stored_password = ***' in the AB-01 traceback; test_code has the correct line."
     }
   ]
 }

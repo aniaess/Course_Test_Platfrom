@@ -1,0 +1,195 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 7,
+    "passed": 3,
+    "failed": 4,
+    "error": 0,
+    "skipped": 0,
+    "tests": [
+      {
+        "test_id": "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "status": "failed"
+      },
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "status": "failed"
+      },
+      {
+        "test_id": "tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]",
+        "status": "failed"
+      },
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[A-422]",
+        "status": "passed"
+      },
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+        "status": "failed"
+      },
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-201]",
+        "status": "passed"
+      },
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-422]",
+        "status": "passed"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "test_id": "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+      "type": "db",
+      "status": "failed",
+      "time": 0.397,
+      "test_cases": [
+        {
+          "id": "REG-DB-06",
+          "title": "Password stored as Argon2id hash",
+          "test_data": "User created through the API",
+          "expected_result": "Stored value starts with `$argon2id$` and has at most 255 characters"
+        }
+      ],
+      "message": "AssertionError: assert False\n +  where False = <built-in method startswith of str object at 0x7d5affd02430>('$argon2id$')\n +    where <built-in method startswith of str object at 0x7d5affd02430> = '$argon2i$v=19$m=65536,t=3,p=4$dYhRmnMl8YctjNcuDGZcNg$7VLdbVwZPSCRRcwnB7WWBHjBN0hI8u/4rpVgXBfRPKc'.startswith",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x7d5b0017f4d0>\ndb_connection = <connection object at 0x7d5affd1e5c0; dsn: 'user=postgres password=*** dbname=course_platform host=db port=5432', closed: 0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-ea54be38-50b9-4c70-9273-22a70bc12285@test.pl', 'password': '***'}\n\n    def test_password_is_stored_as_argon2id_hash(\n        api_client,\n        db_connection,\n        user_data\n    ):\n        \"\"\"\n        Verify that the user's password is stored as an Argon2id hash.\n    \n        The test creates a user through the API and then reads the stored\n        password value from the database.\n    \n        The test verifies that the stored value uses the Argon2id PHC string\n        format (prefix \"$argon2id$\") and fits in the password column.\n        \"\"\"\n    \n        response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n        assert response.status_code == 201\n    \n        stored_password = ***\n            db_connection,\n            user_data[\"email\"]\n        )\n    \n>       assert stored_password.startswith(\"$argon2id$\")\nE       AssertionError: assert False\nE        +  where False = <built-in method startswith of str object at 0x7d5affd02430>('$argon2id$')\nE        +    where <built-in method startswith of str object at 0x7d5affd02430> = '$argon2i$v=19$m=65536,t=3,p=4$dYhRmnMl8YctjNcuDGZcNg$7VLdbVwZPSCRRcwnB7WWBHjBN0hI8u/4rpVgXBfRPKc'.startswith\n\ntests/db/test_users_db.py:258: AssertionError",
+      "test_code": {
+        "file": "tests/db/test_users_db.py",
+        "line": 231,
+        "source": "def test_password_is_stored_as_argon2id_hash(\n    api_client,\n    db_connection,\n    user_data\n):\n    \"\"\"\n    Verify that the user's password is stored as an Argon2id hash.\n\n    The test creates a user through the API and then reads the stored\n    password value from the database.\n\n    The test verifies that the stored value uses the Argon2id PHC string\n    format (prefix \"$argon2id$\") and fits in the password column.\n    \"\"\"\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n\n    stored_password = get_stored_password(\n        db_connection,\n        user_data[\"email\"]\n    )\n\n    assert stored_password.startswith(\"$argon2id$\")\n    assert len(stored_password) <= 255"
+      },
+      "logs": [
+        "2026-10-26 12:57:05,736 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 12:57:05,762 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 12:57:05,776 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-26 12:57:05,781 | INFO | conftest | START TEST: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "2026-10-26 12:57:05,782 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 12:57:05,785 | INFO | conftest | Connecting to database",
+        "2026-10-26 12:57:05,786 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-26 12:57:05,807 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-26 12:57:05,808 | INFO | conftest | Database connection established",
+        "2026-10-26 12:57:05,809 | INFO | conftest | Generated test user data for email: playwright-ea54be38-50b9-4c70-9273-22a70bc12285@test.pl",
+        "2026-10-26 12:57:05,811 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 12:57:06,112 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-26 12:57:06,200 | INFO | conftest | Closing database connection",
+        "2026-10-26 12:57:06,201 | INFO | conftest | Database connection closed",
+        "2026-10-26 12:57:06,203 | ERROR | conftest | TEST FAILED: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash",
+        "2026-10-26 12:57:06,205 | INFO | conftest | END TEST: tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    },
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+      "type": "api",
+      "status": "failed",
+      "time": 0.334,
+      "test_cases": [
+        {
+          "id": "REG-API-02",
+          "title": "Duplicate email",
+          "test_data": "Email of an already registered user",
+          "expected_result": "HTTP 409"
+        }
+      ],
+      "message": "assert 400 == 409\n +  where 400 = <Response [400]>.status_code",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x7d5affd1c7d0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-3b22dbcc-0481-4bbf-8eb7-aa05ac2cf8d1@test.pl', 'password': '***'}\n\n    def test_create_user_with_duplicate_email_returns_409(\n        api_client,\n        user_data\n    ):\n        \"\"\"\n        Verify that the API rejects a user registration when the email\n        address is already registered.\n    \n        The test first creates a user with valid data and then attempts\n        to create another user using the same email address.\n    \n        The test verifies that the API returns HTTP 409 Conflict and\n        provides the expected duplicate-email error message.\n        \"\"\"\n    \n        first_response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n        assert first_response.status_code == 201\n    \n        second_response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n>       assert second_response.status_code == 409\nE       assert 400 == 409\nE        +  where 400 = <Response [400]>.status_code\n\ntests/api/test_users_api.py:58: AssertionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 31,
+        "source": "def test_create_user_with_duplicate_email_returns_409(\n    api_client,\n    user_data\n):\n    \"\"\"\n    Verify that the API rejects a user registration when the email\n    address is already registered.\n\n    The test first creates a user with valid data and then attempts\n    to create another user using the same email address.\n\n    The test verifies that the API returns HTTP 409 Conflict and\n    provides the expected duplicate-email error message.\n    \"\"\"\n\n    first_response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert first_response.status_code == 201\n\n    second_response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert second_response.status_code == 409\n\n    response_data = second_response.json()\n\n    assert response_data[\"detail\"] == Messages.EMAIL_ALREADY_EXISTS"
+      },
+      "logs": [
+        "2026-10-26 12:57:06,212 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "2026-10-26 12:57:06,213 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 12:57:06,214 | INFO | conftest | Generated test user data for email: playwright-3b22dbcc-0481-4bbf-8eb7-aa05ac2cf8d1@test.pl",
+        "2026-10-26 12:57:06,215 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 12:57:06,370 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-26 12:57:06,371 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 12:57:06,535 | INFO | tests.api.client.api_client | Response status: 400",
+        "2026-10-26 12:57:06,548 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409",
+        "2026-10-26 12:57:06,552 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    },
+    {
+      "test_id": "tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]",
+      "type": "ui",
+      "status": "failed",
+      "time": 7.653,
+      "test_cases": [
+        {
+          "id": "REG-UI-12",
+          "title": "Go to login after registration",
+          "test_data": "Valid name, unique email, valid password; click \"Log in\"",
+          "expected_result": "Login page is opened"
+        }
+      ],
+      "message": "AssertionError: Page title expected to be 'Login - Course Platform'\nActual value: Login - AI Academy \nCall log:\n  - Expect \"to_have_title\" with timeout 5000ms\n    14 × locator resolved to <html lang=\"en\">…</html>\n       - unexpected value \"Login - AI Academy\"\n\nAria snapshot:\n- banner:\n  - text: AI Academy\n  - navigation:\n    - link \"Home\":\n      - /url: index.html\n    - link \"Register\":\n      - /url: register.html\n- main:\n  - heading \"Login\" [level=1]\n  - paragraph: Sign in to your account.\n  - textbox \"Email\"\n  - textbox \"Password\"\n  - button \"Login\"",
+      "traceback": "register_page = <tests.ui.pages.register_page.RegisterPage object at 0x7d5aff1b41a0>\nuser_data = {'name': 'Playwright User', 'email': 'playwright-0e967083-2a64-4b4e-b974-78eba638cc69@test.pl', 'password': '***'}\n\n    def test_user_can_go_to_login_page_after_registration(\n        register_page,\n        user_data\n    ):\n        \"\"\"\n        Verify that the \"Log in\" button shown after a successful\n        registration opens the login page.\n        \"\"\"\n    \n        register_page.open()\n    \n        register_page.register_user(\n            name=user_data[\"name\"],\n            email=user_data[\"email\"],\n            password=***\"password\"]\n        )\n    \n        register_page.login_button.click()\n    \n>       expect(register_page.page).to_have_title(\"Login - Course Platform\")\nE       AssertionError: Page title expected to be 'Login - Course Platform'\nE       Actual value: Login - AI Academy \nE       Call log:\nE         - Expect \"to_have_title\" with timeout 5000ms\nE           14 × locator resolved to <html lang=\"en\">…</html>\nE              - unexpected value \"Login - AI Academy\"\nE       \nE       Aria snapshot:\nE       - banner:\nE         - text: AI Academy\nE         - navigation:\nE           - link \"Home\":\nE             - /url: index.html\nE           - link \"Register\":\nE             - /url: register.html\nE       - main:\nE         - heading \"Login\" [level=1]\nE         - paragraph: Sign in to your account.\nE         - textbox \"Email\"\nE         - textbox \"Password\"\nE         - button \"Login\"\n\ntests/ui/test_register.py:63: AssertionError",
+      "test_code": {
+        "file": "tests/ui/test_register.py",
+        "line": 44,
+        "source": "def test_user_can_go_to_login_page_after_registration(\n    register_page,\n    user_data\n):\n    \"\"\"\n    Verify that the \"Log in\" button shown after a successful\n    registration opens the login page.\n    \"\"\"\n\n    register_page.open()\n\n    register_page.register_user(\n        name=user_data[\"name\"],\n        email=user_data[\"email\"],\n        password=user_data[\"password\"]\n    )\n\n    register_page.login_button.click()\n\n    expect(register_page.page).to_have_title(\"Login - Course Platform\")"
+      },
+      "logs": [
+        "2026-10-26 12:57:07,375 | INFO | conftest | START TEST: tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]",
+        "2026-10-26 12:57:07,516 | INFO | conftest | Creating RegisterPage",
+        "2026-10-26 12:57:07,519 | INFO | conftest | Generated test user data for email: playwright-0e967083-2a64-4b4e-b974-78eba638cc69@test.pl",
+        "2026-10-26 12:57:07,521 | INFO | tests.ui.pages.base_page | Opening page: http://api:8000/register",
+        "2026-10-26 12:57:07,735 | INFO | tests.ui.pages.base_page | Registering user with email: playwright-0e967083-2a64-4b4e-b974-78eba638cc69@test.pl",
+        "2026-10-26 12:57:08,089 | INFO | tests.ui.pages.base_page | Registration form submitted",
+        "2026-10-26 12:57:14,092 | ERROR | conftest | TEST FAILED: tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]",
+        "2026-10-26 12:57:14,101 | INFO | conftest | END TEST: tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]"
+      ],
+      "artifacts": {
+        "screenshots": [
+          "test-results/playwright/tests-ui-test-register-py-test-user-can-go-to-login-page-after-registration-chromium/test-failed-1.png"
+        ],
+        "traces": [
+          "test-results/playwright/tests-ui-test-register-py-test-user-can-go-to-login-page-after-registration-chromium/trace.zip"
+        ]
+      }
+    },
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+      "type": "api",
+      "status": "failed",
+      "time": 0.161,
+      "test_cases": [
+        {
+          "id": "REG-API-05",
+          "title": "Name length boundaries",
+          "test_data": "1 / 2 / 100 / 101 characters",
+          "expected_result": "422 / 201 / 201 / 422"
+        }
+      ],
+      "message": "assert 201 == 422\n +  where 201 = <Response [201]>.status_code",
+      "traceback": "api_client = <tests.api.client.api_client.ApiClient object at 0x7d5aff93f6f0>\nname = 'AB', expected_status_code = 422\n\n    @pytest.mark.parametrize(\n        \"name, expected_status_code\",\n        [\n            (\"A\", 422),        # 1 character - below minimum\n            (\"AB\", 422),       # 2 characters - minimum\n            (\"A\" * 100, 201),  # 100 characters - maximum\n            (\"A\" * 101, 422),  # 101 characters - above maximum\n        ]\n    )\n    def test_create_user_with_name_length_boundary(\n        api_client,\n        name,\n        expected_status_code\n    ):\n        \"\"\"\n        Verify that the API correctly validates the length of the user's name.\n    \n        The test checks values below, at, and above the allowed name length\n        boundaries. The minimum allowed length is 2 characters and the maximum\n        allowed length is 100 characters.\n    \n        The test verifies that values within the allowed range are accepted\n        with HTTP 201 Created, while values outside the range are rejected\n        with HTTP 422 Unprocessable Entity.\n        \"\"\"\n    \n        user_data = {\n            \"name\": name,\n            \"email\": f\"test-{uuid.uuid4()}@test.pl\",\n            \"password\": \"***\"\n        }\n    \n        response = api_client.post(\n            \"/users\",\n            json=user_data\n        )\n    \n>       assert response.status_code == expected_status_code\nE       assert 201 == 422\nE        +  where 201 = <Response [201]>.status_code\n\ntests/api/test_users_api.py:210: AssertionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 173,
+        "source": "@pytest.mark.parametrize(\n    \"name, expected_status_code\",\n    [\n        (\"A\", 422),        # 1 character - below minimum\n        (\"AB\", 422),       # 2 characters - minimum\n        (\"A\" * 100, 201),  # 100 characters - maximum\n        (\"A\" * 101, 422),  # 101 characters - above maximum\n    ]\n)\ndef test_create_user_with_name_length_boundary(\n    api_client,\n    name,\n    expected_status_code\n):\n    \"\"\"\n    Verify that the API correctly validates the length of the user's name.\n\n    The test checks values below, at, and above the allowed name length\n    boundaries. The minimum allowed length is 2 characters and the maximum\n    allowed length is 100 characters.\n\n    The test verifies that values within the allowed range are accepted\n    with HTTP 201 Created, while values outside the range are rejected\n    with HTTP 422 Unprocessable Entity.\n    \"\"\"\n\n    user_data = {\n        \"name\": name,\n        \"email\": f\"test-{uuid.uuid4()}@test.pl\",\n        \"password\": \"secret123\"\n    }\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == expected_status_code\n\n    if expected_status_code == 422:\n        response_data = response.json()\n\n        assert response_data[\"detail\"][0][\"loc\"] == [\n            \"body\",\n            \"name\"\n        ]"
+      },
+      "logs": [
+        "2026-10-26 12:57:14,288 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+        "2026-10-26 12:57:14,289 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-26 12:57:14,291 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-26 12:57:14,440 | INFO | tests.api.client.api_client | Response status: 201",
+        "2026-10-26 12:57:14,457 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]",
+        "2026-10-26 12:57:14,460 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}
