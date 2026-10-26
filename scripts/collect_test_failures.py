@@ -4,7 +4,8 @@ Usage: python scripts/collect_test_failures.py [junit.xml] [output.json]
 
 Defaults: test-results/junit.xml -> test-results/failures.json
 
-For every failed test the JSON contains the test cases it covers (with
+The JSON lists all tests of the run in execution order with their
+status. For every failed test it also contains the test cases it covers (with
 the expected result, from docs/test-cases/*.md), the error message,
 the end of the traceback, the source code of the test, the logs
 captured for that test and the paths of the Playwright screenshot and
@@ -246,6 +247,12 @@ def collect(report_path: Path) -> dict:
             "run_id": os.getenv("GITHUB_RUN_ID"),
             "total": len(testcases),
             **counts,
+            # All tests of the run in execution order, so that a failure
+            # caused by data left by an earlier test can be traced.
+            "tests": [
+                {"test_id": get_test_id(case), "status": status}
+                for case, status in zip(testcases, statuses)
+            ],
         },
         "failures": [
             collect_failure(case, status, test_cases)
