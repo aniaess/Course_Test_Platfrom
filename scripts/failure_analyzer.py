@@ -46,7 +46,9 @@ GitHub Actions.
 You get a JSON document with the failed tests. For every failure it
 contains the test cases it covers with the expected result, the error
 message, the end of the traceback, the source code of the test and the
-logs captured for the test.
+logs captured for the test. run.tests lists all tests of the run in
+execution order with their status, which can show that an earlier test
+left data that a later test depends on.
 
 Analyze every failed test using only the provided evidence. Do not
 invent facts. Distinguish confirmed facts from hypotheses:
@@ -66,7 +68,7 @@ Classify every failure as one of:
 - insufficient_evidence: the data is not enough to decide.
 
 When several tests fail for the same reason, say so in the summary.
-Write the texts in Polish.
+Write the texts in English.
 """
 
 ANALYSIS_SCHEMA = {
