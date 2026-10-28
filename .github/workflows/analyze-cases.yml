@@ -37,6 +37,7 @@ jobs:
         run: |
           # The commit keeps two runs of the same day and model apart.
           results="evaluation/results/$(date -u +%F)_${ANTHROPIC_MODEL}_${GITHUB_SHA::7}"
+          echo "RESULTS=$results" >> "$GITHUB_ENV"
           missing=0
 
           for input in evaluation/cases/*/failures.json; do
@@ -62,6 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: analysis-results
-          path: evaluation/results/
+          # Only this run: the results of earlier runs are in the checkout too.
+          path: ${{ env.RESULTS }}
           if-no-files-found: warn
           retention-days: 14
