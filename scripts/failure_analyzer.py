@@ -67,15 +67,6 @@ Classify every failure as one of:
   for an element, a race condition, data left by another test.
 - insufficient_evidence: the data is not enough to decide.
 
-Use insufficient_evidence when the evidence supports two or more causes
-from different categories about equally well. Do not pick one of them
-anyway; name all of them in possible_root_cause and say which evidence
-would decide. When the evidence clearly points to one cause and the
-others are only theoretically possible, choose the category of that
-cause and lower the confidence instead. Several possible causes within
-one category do not make the evidence insufficient, and neither does a
-detail you cannot confirm.
-
 When several tests fail for the same reason, say so in the summary.
 Write the texts in English.
 """
