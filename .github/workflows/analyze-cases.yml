@@ -35,7 +35,8 @@ jobs:
       # missing report is what marks a failed case.
       - name: Analyze cases
         run: |
-          results="evaluation/results/$(date -u +%F)_${ANTHROPIC_MODEL}"
+          # The commit keeps two runs of the same day and model apart.
+          results="evaluation/results/$(date -u +%F)_${ANTHROPIC_MODEL}_${GITHUB_SHA::7}"
           missing=0
 
           for input in evaluation/cases/*/failures.json; do
