@@ -1,0 +1,66 @@
+name: Analyze evaluation cases
+
+# Runs the AI failure analysis on the saved failures.json files of the
+# evaluation dataset. No tests are run here. workflow_dispatch works only
+# when this file is on the default branch, so a push starts it too.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - evaluation/cases/**
+      - scripts/failure_analyzer.py
+      - .github/workflows/analyze-cases.yml
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_MODEL: claude-opus-5-5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      # The analyzer exits with code 0 when the API call fails, so a
+      # missing report is what marks a failed case.
+      - name: Analyze cases
+        run: |
+          results="evaluation/results/$(date -u +%F)_${ANTHROPIC_MODEL}"
+          missing=0
+
+          for input in evaluation/cases/*/failures.json; do
+            case_id="$(basename "$(dirname "$input")")"
+            report="$results/$case_id.md"
+
+            echo "::group::$case_id"
+            python scripts/failure_analyzer.py "$input" "$report"
+            echo "::endgroup::"
+
+            if [ -f "$report" ]; then
+              { echo "# $case_id"; echo; cat "$report"; echo; } >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::error::No report for $case_id"
+              missing=1
+            fi
+          done
+
+          exit "$missing"
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-results
+          path: evaluation/results/
+          if-no-files-found: warn
+          retention-days: 14
