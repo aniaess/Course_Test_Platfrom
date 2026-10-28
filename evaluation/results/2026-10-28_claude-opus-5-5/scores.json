@@ -1,0 +1,42 @@
+{
+  "model": "claude-opus-5-5",
+  "date": "2026-10-28",
+  "run": "https://github.com/aniaess/Course_Test_Platfrom/actions/runs/40660225383",
+  "analyzer_commit": "4409d35",
+  "method": {
+    "unit": "One diagnosis = one failed test. MIX-01 has four diagnoses, each scored against the case named in its 'expected' map, so 15 single cases + 4 = 19 diagnoses.",
+    "category": "Correct when failure_category equals actual_category or is in acceptable_categories.",
+    "root_cause": "Judged manually against actual_root_cause: correct = the same mechanism is the main hypothesis; partial = the mechanism is mentioned only as one of several alternatives or a key part is missing; wrong = a different mechanism. For IE cases the reference cause is that the data cannot decide, so correct means the model says so and names the actual cause among the alternatives.",
+    "evidence": "Supported when every quoted line appears in failures.json (whitespace-normalized) and the key_evidence signals are covered. Three lines restate JSON fields of the test case in another format with the same values; they count as supported."
+  },
+  "diagnoses": [
+    {"case_id": "AB-01", "expected": "application_bug", "model": "application_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Names PasswordHasher with type=Type.I."},
+    {"case_id": "AB-02", "expected": "application_bug", "model": "application_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Missing whitespace stripping in the Pydantic model."},
+    {"case_id": "AB-03", "expected": "application_bug", "model": "application_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Duplicate email mapped to 400 instead of 409."},
+    {"case_id": "AB-04", "expected": "application_bug", "model": "application_bug", "confidence": "medium", "category": true, "root_cause": "partial", "evidence": true, "note": "Blames the backend error or the frontend's mapping of the 422 response; does not see that the frontend validation lets a 7-character password through."},
+    {"case_id": "TB-01", "expected": "test_bug", "model": "test_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Outdated 'Course Platform' title after the rebrand."},
+    {"case_id": "TB-02", "expected": "test_bug", "model": "test_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Wrong locator '#register-msg'; says the real id is unconfirmed (the snapshot has no ids)."},
+    {"case_id": "TB-03", "expected": "test_bug", "model": "test_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Wrong expected status 422 for the 2-character name."},
+    {"case_id": "ENV-01", "expected": "environment_issue", "model": "environment_issue", "confidence": "high", "category": true, "root_cause": "partial", "evidence": true, "note": "Quotes 'base URL: http://api:8001' but puts 'API container not running / not ready' first; the wrong port in the configuration is only one of the alternatives."},
+    {"case_id": "ENV-02", "expected": "environment_issue", "model": "environment_issue", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "Mismatched DB password."},
+    {"case_id": "ENV-03", "expected": "environment_issue", "model": "environment_issue", "confidence": "medium", "category": true, "root_cause": "correct", "evidence": true, "note": "Schema not initialized."},
+    {"case_id": "FL-01", "expected": "flaky_test", "model": "flaky_test", "confidence": "medium", "category": true, "root_cause": "correct", "evidence": true, "note": "text_content() without auto-waiting, read 7 ms after the click."},
+    {"case_id": "FL-02", "expected": "flaky_test", "model": "flaky_test", "confidence": "medium", "category": true, "root_cause": "correct", "evidence": true, "note": "100 ms timeout vs ~585 ms API response."},
+    {"case_id": "FL-03", "expected": "flaky_test", "model": "test_bug", "confidence": "medium", "category": true, "root_cause": "partial", "evidence": true, "note": "test_bug is acceptable. Finds the hardcoded 'shared-user@test.pl' and the committed row, but blames a previous run; does not connect it to test_create_user that ran just before in run.tests."},
+    {"case_id": "IE-01", "expected": "insufficient_evidence", "model": "application_bug", "confidence": "medium", "category": false, "root_cause": "partial", "evidence": true, "note": "Main hypothesis is an unhandled exception in the handler. It mentions that an environment cause cannot be ruled out without server logs and that the API could have a different DB configuration (the actual cause), but still picks application_bug."},
+    {"case_id": "IE-02", "expected": "insufficient_evidence", "model": "environment_issue", "confidence": "low", "category": false, "root_cause": "correct", "evidence": true, "note": "Lists a browser crash, a fixture closing the page (the actual cause) and others, and writes 'The available data cannot distinguish between these causes', yet picks environment_issue."},
+    {"case_id": "MIX-01", "test_id": "tests/db/test_users_db.py::test_password_is_stored_as_argon2id_hash", "reference": "AB-01", "expected": "application_bug", "model": "application_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": ""},
+    {"case_id": "MIX-01", "test_id": "tests/api/test_users_api.py::test_create_user_with_duplicate_email_returns_409", "reference": "AB-03", "expected": "application_bug", "model": "application_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": ""},
+    {"case_id": "MIX-01", "test_id": "tests/ui/test_register.py::test_user_can_go_to_login_page_after_registration[chromium]", "reference": "TB-01", "expected": "test_bug", "model": "test_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": ""},
+    {"case_id": "MIX-01", "test_id": "tests/api/test_users_api.py::test_create_user_with_name_length_boundary[AB-422]", "reference": "TB-03", "expected": "test_bug", "model": "test_bug", "confidence": "high", "category": true, "root_cause": "correct", "evidence": true, "note": "The two API failures were kept apart: AB-03 as application_bug, TB-03 as test_bug."}
+  ],
+  "metrics": {
+    "diagnoses": 19,
+    "category_correct": "17/19",
+    "root_cause_correct": "15/19",
+    "root_cause_partial": "4/19",
+    "evidence_supported": "19/19",
+    "insufficient_evidence_recognized": "0/2",
+    "insufficient_evidence_false_positives": 0
+  }
+}
