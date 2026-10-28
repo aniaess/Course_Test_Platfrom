@@ -1,7 +1,11 @@
+# v1 – baseline
 
-# Evaluation of the AI failure analysis – claude-opus-5-5, 2026-10-28
-
-Analyzer at commit `4409d35`, run [40660225383](https://github.com/aniaess/Course_Test_Platfrom/actions/runs/40660225383). One diagnosis = one failed test: 15 single cases + 4 failures of MIX-01 = 19. Details and scoring rules are in `scores.json`.
+- **Date:** 2026-10-28
+- **Model:** claude-opus-5-5
+- **Analyzer:** commit `4409d35`, the prompt without any rule for insufficient_evidence
+- **Dataset:** 16 cases, 19 diagnoses (15 single cases + 4 failures of MIX-01)
+- **Run:** [40660225383](https://github.com/aniaess/Course_Test_Platfrom/actions/runs/40660225383)
+- **Reports and scores:** `evaluation/results/2026-10-28_claude-opus-5-5/`
 
 | Metric | Result |
 | --- | --- |
@@ -10,6 +14,7 @@ Analyzer at commit `4409d35`, run [40660225383](https://github.com/aniaess/Cours
 | Correct root cause | 15/19 (78.9%), another 4 partial |
 | Diagnoses supported by evidence | 19/19 (100%) |
 | Insufficient evidence recognized | 0/2 |
+| insufficient_evidence chosen for a case with enough evidence | 0 |
 
 ## Category per case
 
