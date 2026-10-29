@@ -1,0 +1,57 @@
+{
+  "run": {
+    "commit": null,
+    "branch": null,
+    "run_id": null,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "error": 0,
+    "skipped": 0,
+    "tests": [
+      {
+        "test_id": "tests/api/test_users_api.py::test_create_user",
+        "status": "failed"
+      }
+    ]
+  },
+  "failures": [
+    {
+      "test_id": "tests/api/test_users_api.py::test_create_user",
+      "type": "api",
+      "status": "failed",
+      "time": 0.076,
+      "test_cases": [
+        {
+          "id": "REG-API-01",
+          "title": "Successful registration",
+          "test_data": "Valid name, unique email, valid password",
+          "expected_result": "HTTP 201"
+        }
+      ],
+      "message": "requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "traceback": "... (439 lines skipped)\n        :param proxies: (optional) The proxies dictionary to apply to the request.\n        :rtype: requests.Response\n        \"\"\"\n    \n        assert _is_prepared(request)\n    \n        try:\n            conn = self.get_connection_with_tls_context(\n                request, verify, proxies=proxies, cert=cert\n            )\n        except LocationValueError as e:\n            raise InvalidURL(e, request=request)\n    \n        self.cert_verify(conn, request.url, verify, cert)\n        url = self.request_url(request, proxies)\n        self.add_headers(\n            request,\n            stream=stream,\n            timeout=timeout,\n            verify=verify,\n            cert=cert,\n            proxies=proxies,\n        )\n    \n        chunked = not (request.body is None or \"Content-Length\" in request.headers)\n    \n        if isinstance(timeout, tuple):\n            try:\n                connect, read = timeout\n                resolved_timeout = TimeoutSauce(connect=connect, read=read)\n            except ValueError:\n                raise ValueError(\n                    f\"Invalid timeout {timeout}. Pass a (connect, read) timeout tuple, \"\n                    f\"or a single float to set both timeouts to the same value.\"\n                )\n        elif isinstance(timeout, TimeoutSauce):\n            resolved_timeout = timeout\n        else:\n            resolved_timeout = TimeoutSauce(connect=timeout, read=timeout)\n    \n        try:\n            resp = conn.urlopen(\n                method=request.method,\n                url=url,\n                body=request.body,  # type: ignore[arg-type]  # urllib3 stubs don't accept Iterable[bytes | str]\n                headers=request.headers,  # type: ignore[arg-type]  # urllib3#3072\n                redirect=False,\n                assert_same_host=False,\n                preload_content=False,\n                decode_content=False,\n                retries=self.max_retries,\n                timeout=resolved_timeout,\n                chunked=chunked,\n            )\n    \n        except (ProtocolError, OSError) as err:\n>           raise ConnectionError(err, request=request)\nE           requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))\n\n/usr/local/lib/python3.14/site-packages/requests/adapters.py:711: ConnectionError",
+      "test_code": {
+        "file": "tests/api/test_users_api.py",
+        "line": 7,
+        "source": "def test_create_user(api_client, user_data):\n    \"\"\"\n    Verify that a new user can be successfully created through the API.\n\n    The test sends valid user data to the POST /users endpoint and\n    verifies that the API returns HTTP 201 Created.\n\n    The response is also checked to ensure that the created user's\n    name and email match the data sent in the request.\n    \"\"\"\n\n    response = api_client.post(\n        \"/users\",\n        json=user_data\n    )\n\n    assert response.status_code == 201\n\n    response_data = response.json()\n\n    assert response_data[\"name\"] == user_data[\"name\"]\n    assert response_data[\"email\"] == user_data[\"email\"]"
+      },
+      "logs": [
+        "2026-10-29 10:05:38,100 | INFO | app.database | Connecting to PostgreSQL database",
+        "2026-10-29 10:05:38,125 | INFO | app.database | PostgreSQL database connection established",
+        "2026-10-29 10:05:38,141 | INFO | conftest | Deleted 0 test users before test session",
+        "2026-10-29 10:05:38,145 | INFO | conftest | START TEST: tests/api/test_users_api.py::test_create_user",
+        "2026-10-29 10:05:38,146 | INFO | conftest | Creating API client with base URL: http://api:8000",
+        "2026-10-29 10:05:38,149 | INFO | conftest | Generated test user data for email: playwright-95424587-c5ac-44d8-b3e8-204fb689b9fb@test.pl",
+        "2026-10-29 10:05:38,151 | INFO | tests.api.client.api_client | POST /users",
+        "2026-10-29 10:05:39,052 | ERROR | conftest | TEST FAILED: tests/api/test_users_api.py::test_create_user",
+        "2026-10-29 10:05:39,056 | INFO | conftest | END TEST: tests/api/test_users_api.py::test_create_user",
+        "2026-10-29 10:05:39,059 | INFO | conftest | Deleted 0 test users after test session"
+      ],
+      "artifacts": {
+        "screenshots": [],
+        "traces": []
+      }
+    }
+  ]
+}

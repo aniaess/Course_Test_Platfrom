@@ -1,6 +1,6 @@
 {
   "description": "Reference diagnoses for evaluating the failure analysis agent (scripts/failure_analyzer.py). Each case is one deliberately injected failure with a known cause. Cases are run one at a time: apply the change from 'injection', execute 'run', collect failures.json, run the analyzer and compare its diagnosis with 'actual_category' and 'actual_root_cause'.",
-  "version": 1,
+  "version": 2,
   "scoring": {
     "category": "The category is correct when the model's failure_category equals actual_category or is listed in acceptable_categories.",
     "root_cause": "The root cause is correct when the model's possible_root_cause describes the same mechanism as actual_root_cause (judged manually or by a judge model).",
@@ -333,6 +333,77 @@
       ],
       "verified": true,
       "verification_notes": "Verified manually on 2026-10-26: the traceback does NOT show the page.close() line or any conftest frame; it goes from register_page.open() (tests/ui/test_register.py:25) through register_page.py:23 and base_page.py:18 to self.page.goto(url), ending with TargetClosedError. test_code contains only the test, there is no screenshot (the page was already closed), only the trace.zip path. The only hint is the log 'Creating RegisterPage' right before the failure, which may point the model to the fixture but does not prove it, so insufficient_evidence stays the expected category."
+    },
+    {
+      "case_id": "IE-03",
+      "test_id": "tests/api/test_users_api.py::test_create_user",
+      "injection": {
+        "type": "code",
+        "files": ["app/main.py"],
+        "steps": ["At the start of create_user add 'import os; os._exit(1)', so the API process exits while handling POST /users."],
+        "restore": [
+          "git checkout -- app/main.py",
+          "docker compose build",
+          "docker compose up -d --wait api (the API container stays exited, there is no restart policy)"
+        ]
+      },
+      "run": "docker compose run --rm --no-deps tests pytest \"tests/api/test_users_api.py::test_create_user\"",
+      "actual_category": "insufficient_evidence",
+      "acceptable_categories": [],
+      "actual_root_cause": "Actual cause: create_user in the API calls os._exit(1), so the API process exits in the middle of POST /users and the connection is closed without a response. failures.json only shows RemoteDisconnected on the client side and no API server logs. The same error can come from an application crash, the container being killed (e.g. out of memory) or restarted, or a network problem, so the data is not enough to decide.",
+      "key_evidence": [
+        "requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+        "The last log before the failure is 'POST /users', there is no 'Response status'",
+        "No API server logs in failures.json"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-29. After the run 'docker compose ps -a api' showed the API container as 'Exited (1)'. The traceback is cut to the last lines of requests/adapters.py (439 lines skipped), so the test frame is not visible. Unlike ENV-01 (Connection refused) the connection was accepted and then closed, which points to the server side but not to the reason."
+    },
+    {
+      "case_id": "IE-04",
+      "test_id": "tests/api/test_users_api.py::test_create_user",
+      "injection": {
+        "type": "code",
+        "files": ["tests/api/client/api_client.py"],
+        "steps": ["In ApiClient.post pass 'headers={\"Content-Type\": \"text/plain\"}' to requests.post. requests keeps this header when json= is used, so the body is JSON but the API does not parse it as JSON."],
+        "restore": ["git checkout -- tests/api/client/api_client.py", "docker compose build"]
+      },
+      "run": "docker compose run --rm --no-deps tests pytest \"tests/api/test_users_api.py::test_create_user\"",
+      "actual_category": "insufficient_evidence",
+      "acceptable_categories": [],
+      "actual_root_cause": "Actual cause: the test's ApiClient sends POST /users with 'Content-Type: text/plain', so FastAPI does not read the body as JSON and returns HTTP 422. failures.json shows only 'assert 422 == 201' for valid data; the ApiClient code, the request headers and the 422 response body are not included. A 422 for valid data can come from a validation bug in the API or from the test client, so the data is not enough to decide.",
+      "key_evidence": [
+        "assert 422 == 201",
+        "Response status: 422",
+        "user_data with valid name and email, sent with json=user_data",
+        "No response body or request headers in failures.json"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-29. FastAPI 0.143 returned 422 as expected. The traceback ends in the test at tests/api/test_users_api.py:23, no ApiClient frame. Trap: the collector masks the password in user_data as '***' (3 characters), so the model may conclude the password is shorter than the 8-character minimum and call it a test data bug. That mechanism is wrong: the real password is valid, and the same test passes without the injection."
+    },
+    {
+      "case_id": "IE-05",
+      "test_id": "tests/ui/test_register.py::test_user_can_register_successfully[chromium]",
+      "injection": {
+        "type": "environment",
+        "files": [],
+        "steps": [
+          "Restart only the API container with a wrong database password: 'DB_PASSWORD=wrong-password docker compose up -d --force-recreate --no-deps --wait api'. The /health endpoint does not connect to the database, so the API is healthy.",
+          "Run the UI test with the correct password in the tests container (without overriding DB_PASSWORD)."
+        ],
+        "restore": ["docker compose up -d --force-recreate --no-deps --wait api (with the correct DB_PASSWORD)"]
+      },
+      "run": "docker compose run --rm --no-deps tests pytest \"tests/ui/test_register.py::test_user_can_register_successfully\"",
+      "actual_category": "insufficient_evidence",
+      "acceptable_categories": [],
+      "actual_root_cause": "Actual cause: the API container has the wrong DB_PASSWORD and cannot connect to the database, so POST /users ends with HTTP 500 and the frontend shows its generic error message. failures.json shows only the UI message; the HTTP status, the API server logs and the browser console are not included. The generic message can come from an application bug, an environment issue or any non-201 response other than 409, so the data is not enough to decide.",
+      "key_evidence": [
+        "Locator expected to have text 'Registration successful!'",
+        "Actual value: Something went wrong. Please try again later.",
+        "No HTTP status, API server logs or browser console in failures.json"
+      ],
+      "verified": true,
+      "verification_notes": "Verified manually on 2026-10-29. 'docker compose logs api' contained 'password authentication failed for user \"postgres\"'; failures.json does not. The UI version of IE-01: the status code 500 is hidden behind the generic frontend message (frontend/app.js shows it for every status except 201 and 409). There is a screenshot and a trace.zip, but only their paths reach the model. Trap as in IE-01: 'PostgreSQL database connection established' in the logs comes from the tests container. The password in test_code is masked by the collector ('password=***\"password\"]')."
     },
     {
       "case_id": "MIX-01",

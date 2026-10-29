@@ -20,3 +20,10 @@ AB-01..04, TB-01..03, ENV-01..03, FL-01..03, IE-01..02, MIX-01.
 | [v1](v1-baseline.md) | baseline | 17/19 | 15/19 (+4 partial) | 19/19 | 0/2 | 0 |
 | [v2](v2-strict-insufficient-evidence.md) | strict rule for insufficient_evidence | 16/19 | 13/19 (+6 partial) | 19/19 | 2/2 | 3 |
 | [v3](v3-equal-support-rule.md) | insufficient_evidence only for equally supported causes | 17/19 | 14/19 (+5 partial) | 19/19 | 0/2 | 0 |
+
+## Dataset 2: 19 cases, 22 diagnoses
+
+Dataset 1 plus IE-03..05 (`references_cause.json` version 2).
+
+| Version | Change | Category | Root cause | Evidence | Insufficient evidence recognized | insufficient_evidence for a case with enough evidence |
+| --- | --- | --- | --- | --- | --- | --- |
